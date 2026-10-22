@@ -9,6 +9,7 @@ import '../../core/utils/period_utils.dart';
 import '../../domain/entities/savings_entry.dart';
 import '../providers/data_providers.dart';
 import '../providers/finance_actions.dart';
+import '../widgets/app_widgets.dart';
 import '../widgets/field_decoration.dart';
 
 /// Aba do dinheiro guardado: total acumulado + histórico de depósitos/retiradas.
@@ -23,7 +24,7 @@ class SavingsPage extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showDialog<void>(
             context: context, builder: (_) => const _SavingsDialog()),
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.add_rounded),
         label: const Text('Movimentar'),
       ),
       body: entries.when(
@@ -35,27 +36,49 @@ class SavingsPage extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.only(bottom: 88),
             children: [
-              Card(
-                margin: const EdgeInsets.all(16),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      const Text('Total guardado'),
-                      const SizedBox(height: 4),
-                      Text(Money.format(total),
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineMedium
-                              ?.copyWith(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
+              HeroCard(
+                gradient: AppTheme.mintGradient,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                              color: Colors.white.withAlpha(46),
+                              borderRadius: BorderRadius.circular(14)),
+                          child: const Icon(Icons.savings_rounded,
+                              color: Colors.white, size: 20),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text('Total guardado',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16)),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(Money.format(total),
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 36,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -1)),
+                    ),
+                  ],
                 ),
               ),
+              const SectionTitle('Movimentações'),
               if (list.isEmpty)
                 const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Center(child: Text('Nenhuma movimentação ainda.'))),
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: EmptyState(
+                        Icons.savings_rounded, 'Nenhuma movimentação ainda.')),
               for (final e in list) _EntryTile(entry: e),
             ],
           );
@@ -73,22 +96,41 @@ class _EntryTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final deposit = entry.amountCents > 0;
     final color = deposit ? AppTheme.incomeColor : AppTheme.expenseColor;
-    return ListTile(
-      leading:
-          Icon(deposit ? Icons.savings_outlined : Icons.output, color: color),
-      title: Text(entry.note.isEmpty
-          ? (deposit ? 'Depósito' : 'Retirada')
-          : entry.note),
-      subtitle: Text(DateFormat('dd/MM/yyyy').format(entry.date)),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
+    return AppCard(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+      padding: const EdgeInsets.fromLTRB(12, 10, 4, 10),
+      child: Row(
         children: [
+          IconBadge(
+              deposit ? Icons.savings_rounded : Icons.output_rounded, color),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                    entry.note.isEmpty
+                        ? (deposit ? 'Depósito' : 'Retirada')
+                        : entry.note,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 15)),
+                Text(DateFormat('dd/MM/yyyy').format(entry.date),
+                    style: TextStyle(
+                        fontSize: 12.5,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withAlpha(150))),
+              ],
+            ),
+          ),
           Text(
               '${deposit ? '+' : '-'} ${Money.format(entry.amountCents.abs())}',
-              style: TextStyle(color: color, fontWeight: FontWeight.bold)),
+              style: TextStyle(
+                  color: color, fontWeight: FontWeight.w800, fontSize: 15)),
           IconButton(
             tooltip: 'Excluir',
-            icon: const Icon(Icons.delete_outline),
+            icon: const Icon(Icons.delete_outline_rounded),
             onPressed: () async {
               final ok = await showDialog<bool>(
                 context: context,
@@ -99,6 +141,9 @@ class _EntryTile extends ConsumerWidget {
                         onPressed: () => Navigator.pop(ctx, false),
                         child: const Text('Cancelar')),
                     FilledButton(
+                        style: FilledButton.styleFrom(
+                            minimumSize: const Size(96, 44),
+                            backgroundColor: AppTheme.expenseColor),
                         onPressed: () => Navigator.pop(ctx, true),
                         child: const Text('Excluir')),
                   ],

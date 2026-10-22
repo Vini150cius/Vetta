@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/money.dart';
 import '../providers/data_providers.dart';
+import '../widgets/app_widgets.dart';
 import '../widgets/transaction_form.dart';
 import '../widgets/transaction_tile.dart';
 
@@ -20,7 +21,7 @@ class BalancePage extends ConsumerWidget {
       appBar: AppBar(title: const Text('Saldo real x previsto')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showTransactionSheet(context),
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.add_rounded),
         label: const Text('Lançar'),
       ),
       body: ListView(
@@ -36,32 +37,33 @@ class BalancePage extends ConsumerWidget {
             data: (s) => Column(
               children: [
                 _BalanceCard(
-                    title: 'Saldo real',
-                    subtitle: 'Receitas − despesas já realizadas',
-                    cents: s.balance),
+                  title: 'Saldo real',
+                  subtitle: 'Receitas − despesas já realizadas',
+                  icon: Icons.account_balance_wallet_rounded,
+                  gradient: AppTheme.heroGradient,
+                  cents: s.balance,
+                ),
                 _BalanceCard(
                   title: 'Saldo previsto',
                   subtitle:
                       'Real + previstos (${Money.format(s.plannedIncome)} a receber, ${Money.format(s.plannedExpense)} a pagar)',
+                  icon: Icons.insights_rounded,
+                  gradient: AppTheme.sunsetGradient,
                   cents: s.projectedBalance,
                 ),
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-            child: Text('Lançamentos previstos',
-                style: Theme.of(context).textTheme.titleMedium),
-          ),
+          const SectionTitle('Lançamentos previstos'),
           planned.when(
             skipLoadingOnReload: true,
             loading: () => const SizedBox.shrink(),
             error: (e, _) => Text('Erro: $e'),
             data: (list) => list.isEmpty
                 ? const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text(
-                        'Nada previsto. Marque "Previsto" ao lançar uma despesa futura.'))
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: EmptyState(Icons.event_available_rounded,
+                        'Nada previsto.\nMarque "Previsto" ao lançar uma despesa futura.'))
                 : Column(
                     children: [for (final t in list) TransactionTile(tx: t)]),
           ),
@@ -72,35 +74,58 @@ class BalancePage extends ConsumerWidget {
 }
 
 class _BalanceCard extends StatelessWidget {
-  const _BalanceCard(
-      {required this.title, required this.subtitle, required this.cents});
+  const _BalanceCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.gradient,
+    required this.cents,
+  });
   final String title;
   final String subtitle;
+  final IconData icon;
+  final Gradient gradient;
   final int cents;
 
   @override
-  Widget build(BuildContext context) => Card(
-        margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(height: 4),
-              Text(
-                Money.format(cents),
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: cents >= 0
-                          ? AppTheme.incomeColor
-                          : AppTheme.expenseColor,
-                    ),
-              ),
-              const SizedBox(height: 4),
-              Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
-            ],
-          ),
+  Widget build(BuildContext context) => HeroCard(
+        gradient: gradient,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(46),
+                      borderRadius: BorderRadius.circular(14)),
+                  child: Icon(icon, color: Colors.white, size: 20),
+                ),
+                const SizedBox(width: 10),
+                Text(title,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16)),
+              ],
+            ),
+            const SizedBox(height: 14),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(Money.format(cents),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 34,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -1)),
+            ),
+            const SizedBox(height: 6),
+            Text(subtitle,
+                style: TextStyle(
+                    color: Colors.white.withAlpha(210), fontSize: 12.5)),
+          ],
         ),
       );
 }

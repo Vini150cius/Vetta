@@ -1,4 +1,4 @@
-# Finanças — MVP Flutter (Android, offline-first)
+# Vetta — MVP Flutter (Android, offline-first)
 
 ## Como rodar
 ```bash

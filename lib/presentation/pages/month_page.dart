@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/utils/period_utils.dart';
 import '../providers/data_providers.dart';
+import '../widgets/app_widgets.dart';
 import '../widgets/filter_sheet.dart';
 import '../widgets/period_navigator.dart';
 import '../widgets/summary_card.dart';
@@ -29,10 +30,11 @@ class MonthPage extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mês'), actions: const [FilterButton()]),
+      appBar:
+          AppBar(title: const Text('Seu mês'), actions: const [FilterButton()]),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showTransactionSheet(context),
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.add_rounded),
         label: const Text('Lançar'),
       ),
       body: Column(
@@ -45,25 +47,25 @@ class MonthPage extends ConsumerWidget {
             height: 48,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               children: [
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: const Text('Mês todo'),
+                  child: AppChoiceChip(
+                    label: 'Mês todo',
                     selected: week == null,
-                    onSelected: (_) =>
+                    onSelected: () =>
                         ref.read(selectedWeekProvider.notifier).state = null,
                   ),
                 ),
                 for (var i = 0; i < weeks.length; i++)
                   Padding(
                     padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(
-                          'Sem ${i + 1} (${weeks[i].start.day}–${weeks[i].lastDay.day})'),
+                    child: AppChoiceChip(
+                      label:
+                          'Sem ${i + 1} (${weeks[i].start.day}–${weeks[i].lastDay.day})',
                       selected: week == i,
-                      onSelected: (_) =>
+                      onSelected: () =>
                           ref.read(selectedWeekProvider.notifier).state = i,
                     ),
                   ),
@@ -77,12 +79,10 @@ class MonthPage extends ConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text('Erro ao carregar: $e')),
               data: (list) => list.isEmpty
-                  ? const Center(
-                      child: Text(
-                          'Nenhum lançamento neste período.\nToque em "Lançar" para começar.',
-                          textAlign: TextAlign.center))
+                  ? const EmptyState(Icons.receipt_long_rounded,
+                      'Nenhum lançamento neste período.\nToque em "Lançar" para começar.')
                   : ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 88),
+                      padding: const EdgeInsets.only(top: 4, bottom: 88),
                       itemCount: list.length,
                       itemBuilder: (_, i) => TransactionTile(tx: list[i]),
                     ),

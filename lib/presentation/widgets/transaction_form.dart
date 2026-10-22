@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/constants/app_constants.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/utils/cents_input_formatter.dart';
 import '../../core/utils/money.dart';
 import '../../core/utils/period_utils.dart';
@@ -150,16 +151,22 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text(
+                  widget.initial == null
+                      ? 'Novo lançamento'
+                      : 'Editar lançamento',
+                  style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 14),
               SegmentedButton<TxType>(
                 segments: const [
                   ButtonSegment(
                       value: TxType.expense,
                       label: Text('Gasto'),
-                      icon: Icon(Icons.arrow_upward)),
+                      icon: Icon(Icons.arrow_upward_rounded)),
                   ButtonSegment(
                       value: TxType.income,
                       label: Text('Ganho'),
-                      icon: Icon(Icons.arrow_downward)),
+                      icon: Icon(Icons.arrow_downward_rounded)),
                 ],
                 selected: {_type},
                 onSelectionChanged: (s) => setState(() => _type = s.first),
@@ -170,7 +177,10 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
                 autofocus: widget.initial == null,
                 keyboardType: TextInputType.number,
                 inputFormatters: [CentsInputFormatter()],
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: _type == TxType.income
+                        ? AppTheme.incomeColor
+                        : AppTheme.expenseColor),
                 decoration: fieldDecoration('Valor', icon: Icons.attach_money),
                 validator: (v) => (Money.parseCents(v ?? '') ?? 0) <= 0
                     ? 'Informe um valor'
@@ -217,7 +227,7 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
               const SizedBox(height: 8),
               FilledButton.icon(
                   onPressed: _save,
-                  icon: const Icon(Icons.check),
+                  icon: const Icon(Icons.check_rounded),
                   label: const Text('Salvar')),
             ],
           ),

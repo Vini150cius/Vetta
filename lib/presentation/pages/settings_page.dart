@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../../domain/entities/catalog_item.dart';
 import '../../domain/services/spreadsheet_codec.dart';
 import '../providers/auth_controller.dart';
@@ -9,6 +10,7 @@ import '../providers/data_providers.dart';
 import '../providers/di_providers.dart';
 import '../providers/finance_actions.dart';
 import '../providers/theme_controller.dart';
+import '../widgets/app_widgets.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -155,9 +157,12 @@ class SettingsPage extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ListTile(
-          leading:
-              Icon(isCategory ? Icons.category_outlined : Icons.place_outlined),
-          title: Text(label),
+          leading: IconBadge(
+              isCategory ? Icons.category_rounded : Icons.place_rounded,
+              isCategory ? AppTheme.pink : AppTheme.sky,
+              size: 40),
+          title:
+              Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
           trailing: IconButton(
             tooltip: 'Adicionar',
             icon: const Icon(Icons.add),
@@ -212,8 +217,9 @@ class SettingsPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Ajustes')),
       body: ListView(
+        padding: const EdgeInsets.only(bottom: 24),
         children: [
-          const ListTile(title: Text('Tema')),
+          const SectionTitle('Aparência'),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: SegmentedButton<ThemeMode>(
@@ -222,54 +228,73 @@ class SettingsPage extends ConsumerWidget {
                 ButtonSegment(
                     value: ThemeMode.system,
                     label: Text('Sistema'),
-                    icon: Icon(Icons.brightness_auto)),
+                    icon: Icon(Icons.brightness_auto_rounded)),
                 ButtonSegment(
                     value: ThemeMode.light,
                     label: Text('Claro'),
-                    icon: Icon(Icons.light_mode)),
+                    icon: Icon(Icons.light_mode_rounded)),
                 ButtonSegment(
                     value: ThemeMode.dark,
                     label: Text('Escuro'),
-                    icon: Icon(Icons.dark_mode)),
+                    icon: Icon(Icons.dark_mode_rounded)),
               ],
               selected: {mode},
               onSelectionChanged: (s) =>
                   ref.read(themeControllerProvider.notifier).setMode(s.first),
             ),
           ),
-          const Divider(height: 32),
-          const ListTile(title: Text('Dados (Excel / Google Sheets)')),
-          ListTile(
-            leading: const Icon(Icons.table_view),
-            title: const Text('Exportar CSV'),
-            subtitle:
-                const Text('Separador ";" — abre no Excel e no Google Sheets'),
-            onTap: () => _export(context, ref, SpreadsheetFormat.csv),
+          const SectionTitle('Dados (Excel / Google Sheets)'),
+          AppCard(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const IconBadge(
+                      Icons.table_view_rounded, AppTheme.incomeColor,
+                      size: 40),
+                  title: const Text('Exportar CSV'),
+                  subtitle: const Text(
+                      'Separador ";" — abre no Excel e no Google Sheets'),
+                  onTap: () => _export(context, ref, SpreadsheetFormat.csv),
+                ),
+                ListTile(
+                  leading: const IconBadge(
+                      Icons.grid_on_rounded, AppTheme.primary,
+                      size: 40),
+                  title: const Text('Exportar XLSX'),
+                  onTap: () => _export(context, ref, SpreadsheetFormat.xlsx),
+                ),
+                ListTile(
+                  leading: const IconBadge(
+                      Icons.upload_file_rounded, AppTheme.amber,
+                      size: 40),
+                  title: const Text('Importar CSV / XLSX'),
+                  subtitle: const Text(
+                      'Colunas: Data, Tipo, Valor, Descricao, Categoria, Local, Status'),
+                  onTap: () => _import(context, ref),
+                ),
+              ],
+            ),
           ),
-          ListTile(
-            leading: const Icon(Icons.grid_on),
-            title: const Text('Exportar XLSX'),
-            onTap: () => _export(context, ref, SpreadsheetFormat.xlsx),
+          const SectionTitle('Cadastros',
+              subtitle: 'Opções usadas nos lançamentos'),
+          AppCard(
+            child: Column(
+              children: [
+                _catalogSection(context, ref, CatalogKind.category),
+                const Divider(),
+                _catalogSection(context, ref, CatalogKind.place),
+              ],
+            ),
           ),
-          ListTile(
-            leading: const Icon(Icons.upload_file),
-            title: const Text('Importar CSV / XLSX'),
-            subtitle: const Text(
-                'Colunas: Data, Tipo, Valor, Descricao, Categoria, Local, Status'),
-            onTap: () => _import(context, ref),
-          ),
-          const Divider(height: 32),
-          const ListTile(
-            title: Text('Cadastros'),
-            subtitle: Text('Opções usadas nos lançamentos'),
-          ),
-          _catalogSection(context, ref, CatalogKind.category),
-          _catalogSection(context, ref, CatalogKind.place),
-          const Divider(height: 32),
-          ListTile(
-            leading: const Icon(Icons.lock),
-            title: const Text('Bloquear agora'),
-            onTap: () => ref.read(authControllerProvider.notifier).lock(),
+          const SectionTitle('Segurança'),
+          AppCard(
+            child: ListTile(
+              leading: const IconBadge(
+                  Icons.lock_rounded, AppTheme.expenseColor,
+                  size: 40),
+              title: const Text('Bloquear agora'),
+              onTap: () => ref.read(authControllerProvider.notifier).lock(),
+            ),
           ),
         ],
       ),

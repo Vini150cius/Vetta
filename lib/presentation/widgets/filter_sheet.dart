@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/fin_transaction.dart';
 import '../../domain/entities/transaction_filter.dart';
 import '../providers/data_providers.dart';
+import 'app_widgets.dart';
 
 /// Botão de filtro com indicador (bolinha) quando há filtros ativos.
 class FilterButton extends ConsumerWidget {
@@ -14,7 +15,8 @@ class FilterButton extends ConsumerWidget {
     final active = ref.watch(filterProvider).hasAttributeFilters;
     return IconButton(
       tooltip: 'Filtros',
-      icon: Badge(isLabelVisible: active, child: const Icon(Icons.filter_list)),
+      icon:
+          Badge(isLabelVisible: active, child: const Icon(Icons.tune_rounded)),
       onPressed: () => showFilterSheet(context),
     );
   }
@@ -51,12 +53,13 @@ class _FilterSheet extends ConsumerWidget {
             ? const Text('Nada cadastrado ainda.')
             : Wrap(
                 spacing: 8,
+                runSpacing: 4,
                 children: [
                   for (final v in all)
-                    FilterChip(
-                        label: Text(v),
+                    AppFilterChip(
+                        label: v,
                         selected: selected.contains(v),
-                        onSelected: (_) => onChange(_toggle(selected, v))),
+                        onSelected: () => onChange(_toggle(selected, v))),
                 ],
               );
 
@@ -82,18 +85,18 @@ class _FilterSheet extends ConsumerWidget {
           Wrap(
             spacing: 8,
             children: [
-              ChoiceChip(
-                  label: const Text('Todos'),
+              AppChoiceChip(
+                  label: 'Todos',
                   selected: f.type == null,
-                  onSelected: (_) => update(f.copyWith(clearType: true))),
-              ChoiceChip(
-                  label: const Text('Ganhos'),
+                  onSelected: () => update(f.copyWith(clearType: true))),
+              AppChoiceChip(
+                  label: 'Ganhos',
                   selected: f.type == TxType.income,
-                  onSelected: (_) => update(f.copyWith(type: TxType.income))),
-              ChoiceChip(
-                  label: const Text('Gastos'),
+                  onSelected: () => update(f.copyWith(type: TxType.income))),
+              AppChoiceChip(
+                  label: 'Gastos',
                   selected: f.type == TxType.expense,
-                  onSelected: (_) => update(f.copyWith(type: TxType.expense))),
+                  onSelected: () => update(f.copyWith(type: TxType.expense))),
             ],
           ),
           const SizedBox(height: 16),

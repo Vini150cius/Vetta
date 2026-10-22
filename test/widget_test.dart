@@ -16,7 +16,7 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: FinancasApp()));
     await tester.pump();
 
-    expect(find.text('Finanças'), findsOneWidget);
-    expect(find.byIcon(Icons.fingerprint), findsOneWidget);
+    expect(find.text('Vetta'), findsOneWidget);
+    expect(find.byType(Image), findsOneWidget);
   });
 }

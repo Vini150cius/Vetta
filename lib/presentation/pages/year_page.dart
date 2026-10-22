@@ -8,6 +8,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/money.dart';
 import '../../domain/entities/finance_summary.dart';
 import '../providers/data_providers.dart';
+import '../widgets/app_widgets.dart';
 import '../widgets/filter_sheet.dart';
 import '../widgets/period_navigator.dart';
 import '../widgets/summary_card.dart';
@@ -31,39 +32,101 @@ class YearPage extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erro ao carregar: $e')),
         data: (list) => ListView(
+          padding: const EdgeInsets.only(bottom: 24),
           children: [
             PeriodNavigator(
                 label: '$year',
                 onPrevious: () => goToYear(-1),
                 onNext: () => goToYear(1)),
-            SummaryCard(summary: FinanceSummary.combine(list)),
-            SizedBox(
-                height: 200,
-                child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                    child: _YearChart(list))),
-            const SizedBox(height: 8),
-            for (var m = 0; m < 12; m++)
-              ListTile(
-                title: Text(toBeginningOfSentenceCase(
-                    DateFormat.MMMM('pt_BR').format(DateTime(year, m + 1)))),
-                subtitle: Text(
-                    'Receitas ${Money.format(list[m].income)}  •  Despesas ${Money.format(list[m].expense)}'),
-                trailing: Text(
-                  Money.format(list[m].balance),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: list[m].balance >= 0
-                        ? AppTheme.incomeColor
-                        : AppTheme.expenseColor,
+            SummaryCard(
+                summary: FinanceSummary.combine(list), title: 'Saldo do ano'),
+            AppCard(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text('Receitas x despesas',
+                          style: Theme.of(context).textTheme.titleSmall),
+                      const Spacer(),
+                      const _Legend('Receitas', AppTheme.incomeColor),
+                      const SizedBox(width: 12),
+                      const _Legend('Despesas', AppTheme.expenseColor),
+                    ],
                   ),
-                ),
+                  const SizedBox(height: 12),
+                  SizedBox(height: 180, child: _YearChart(list)),
+                ],
+              ),
+            ),
+            const SectionTitle('Mês a mês'),
+            for (var m = 0; m < 12; m++)
+              AppCard(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 onTap: () {
                   ref.read(selectedMonthProvider.notifier).state =
                       DateTime(year, m + 1);
                   ref.read(selectedWeekProvider.notifier).state = null;
                   context.go('/month'); // detalha o mês tocado
                 },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 46,
+                      height: 46,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppTheme.primary.withAlpha(30),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        DateFormat.MMM('pt_BR')
+                            .format(DateTime(year, m + 1))
+                            .replaceAll('.', '')
+                            .toUpperCase(),
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: Theme.of(context).colorScheme.primary),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              toBeginningOfSentenceCase(DateFormat.MMMM('pt_BR')
+                                  .format(DateTime(year, m + 1))),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 15)),
+                          const SizedBox(height: 2),
+                          Text(
+                            '+ ${Money.format(list[m].income)}   − ${Money.format(list[m].expense)}',
+                            style: TextStyle(
+                                fontSize: 12.5,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withAlpha(150)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      Money.format(list[m].balance),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        color: list[m].balance >= 0
+                            ? AppTheme.incomeColor
+                            : AppTheme.expenseColor,
+                      ),
+                    ),
+                  ],
+                ),
               ),
           ],
         ),
@@ -72,28 +135,36 @@ class YearPage extends ConsumerWidget {
   }
 }
 
+class _Legend extends StatelessWidget {
+  const _Legend(this.label, this.color);
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Row(
+        children: [
+          Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+          const SizedBox(width: 4),
+          Text(label, style: const TextStyle(fontSize: 11.5)),
+        ],
+      );
+}
+
 class _YearChart extends StatelessWidget {
   const _YearChart(this.months);
   final List<FinanceSummary> months;
 
   static const _labels = [
-    'J',
-    'F',
-    'M',
-    'A',
-    'M',
-    'J',
-    'J',
-    'A',
-    'S',
-    'O',
-    'N',
-    'D'
+    'J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D' //
   ];
 
   @override
   Widget build(BuildContext context) {
     const hidden = AxisTitles(sideTitles: SideTitles(showTitles: false));
+    const radius = BorderRadius.vertical(top: Radius.circular(6));
     return BarChart(
       BarChartData(
         gridData: const FlGridData(show: false),
@@ -109,7 +180,8 @@ class _YearChart extends StatelessWidget {
               getTitlesWidget: (v, meta) => SideTitleWidget(
                 axisSide: meta.axisSide,
                 child: Text(_labels[v.toInt()],
-                    style: const TextStyle(fontSize: 11)),
+                    style: const TextStyle(
+                        fontSize: 11, fontWeight: FontWeight.w600)),
               ),
             ),
           ),
@@ -123,11 +195,13 @@ class _YearChart extends StatelessWidget {
                 BarChartRodData(
                     toY: months[i].income / 100,
                     color: AppTheme.incomeColor,
-                    width: 6),
+                    borderRadius: radius,
+                    width: 7),
                 BarChartRodData(
                     toY: months[i].expense / 100,
                     color: AppTheme.expenseColor,
-                    width: 6),
+                    borderRadius: radius,
+                    width: 7),
               ],
             ),
         ],

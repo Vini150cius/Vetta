@@ -1,0 +1,2111 @@
+diff --git a/lib/core/theme/app_theme.dart b/lib/core/theme/app_theme.dart
+index 62bb618..77529f5 100644
+--- a/lib/core/theme/app_theme.dart
++++ b/lib/core/theme/app_theme.dart
+@@ -1,17 +1,149 @@
+ import 'package:flutter/material.dart';
+ 
++/// Identidade visual do app: índigo/violeta vibrante, fundos suaves,
++/// cantos bem arredondados e acentos coloridos (menta, coral, âmbar, azul).
+ class AppTheme {
+   AppTheme._();
+ 
+-  static const incomeColor = Color(0xFF43A047);
+-  static const expenseColor = Color(0xFFE53935);
++  // Cores de marca
++  static const primary = Color(0xFF5B3DF5);
++  static const primaryDeep = Color(0xFF3A22D6);
++  static const violet = Color(0xFF9B6BFF);
++  static const sky = Color(0xFF2EA8FF);
++  static const amber = Color(0xFFFFB02E);
++  static const pink = Color(0xFFEC4899);
++
++  // Cores semânticas
++  static const incomeColor = Color(0xFF12B981);
++  static const expenseColor = Color(0xFFFF5470);
++
++  // Gradientes usados nos cartões de destaque
++  static const heroGradient = LinearGradient(
++    begin: Alignment.topLeft,
++    end: Alignment.bottomRight,
++    colors: [Color(0xFF3A22D6), Color(0xFF7B4DFF), Color(0xFF9B6BFF)],
++  );
++  static const sunsetGradient = LinearGradient(
++    begin: Alignment.topLeft,
++    end: Alignment.bottomRight,
++    colors: [Color(0xFFFF8A3D), Color(0xFFFF4D8D)],
++  );
++  static const mintGradient = LinearGradient(
++    begin: Alignment.topLeft,
++    end: Alignment.bottomRight,
++    colors: [Color(0xFF0BA5A4), Color(0xFF34D399)],
++  );
+ 
+   static final ThemeData light = _build(Brightness.light);
+   static final ThemeData dark = _build(Brightness.dark);
+ 
+-  static ThemeData _build(Brightness brightness) => ThemeData(
+-        useMaterial3: true,
+-        colorScheme: ColorScheme.fromSeed(
+-            seedColor: const Color(0xFF00796B), brightness: brightness),
+-      );
++  static ThemeData _build(Brightness brightness) {
++    final dark = brightness == Brightness.dark;
++    final onSurface = dark ? const Color(0xFFF1EEFF) : const Color(0xFF1B1740);
++
++    final scheme = ColorScheme.fromSeed(
++      seedColor: primary,
++      brightness: brightness,
++    ).copyWith(
++      primary: dark ? const Color(0xFFA78BFF) : primary,
++      onPrimary: dark ? const Color(0xFF1B1140) : Colors.white,
++      surface: dark ? const Color(0xFF1B1836) : Colors.white,
++      onSurface: onSurface,
++      surfaceContainerHighest:
++          dark ? const Color(0xFF262248) : const Color(0xFFEFEBFF),
++    );
++
++    final base = ThemeData(
++        useMaterial3: true, colorScheme: scheme, brightness: brightness);
++    final t = base.textTheme;
++
++    return base.copyWith(
++      scaffoldBackgroundColor:
++          dark ? const Color(0xFF110F26) : const Color(0xFFF5F3FF),
++      textTheme: t.copyWith(
++        headlineMedium: t.headlineMedium
++            ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.5),
++        headlineSmall: t.headlineSmall
++            ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.3),
++        titleLarge: t.titleLarge
++            ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.3),
++        titleMedium: t.titleMedium?.copyWith(fontWeight: FontWeight.w700),
++        titleSmall: t.titleSmall?.copyWith(fontWeight: FontWeight.w700),
++      ),
++      appBarTheme: AppBarTheme(
++        backgroundColor: Colors.transparent,
++        surfaceTintColor: Colors.transparent,
++        elevation: 0,
++        scrolledUnderElevation: 0,
++        centerTitle: false,
++        titleTextStyle: TextStyle(
++          color: onSurface,
++          fontSize: 24,
++          fontWeight: FontWeight.w800,
++          letterSpacing: -0.5,
++        ),
++      ),
++      floatingActionButtonTheme: FloatingActionButtonThemeData(
++        backgroundColor: scheme.primary,
++        foregroundColor: scheme.onPrimary,
++        elevation: 6,
++        extendedTextStyle:
++            const TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.2),
++        shape: const StadiumBorder(),
++      ),
++      filledButtonTheme: FilledButtonThemeData(
++        style: FilledButton.styleFrom(
++          minimumSize: const Size(88, 52),
++          shape: const StadiumBorder(),
++          textStyle:
++              const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
++        ),
++      ),
++      outlinedButtonTheme: OutlinedButtonThemeData(
++        style: OutlinedButton.styleFrom(
++          shape: const StadiumBorder(),
++          side: BorderSide(color: scheme.primary.withAlpha(90)),
++        ),
++      ),
++      bottomSheetTheme: BottomSheetThemeData(
++        backgroundColor: scheme.surface,
++        surfaceTintColor: Colors.transparent,
++        showDragHandle: true,
++        shape: const RoundedRectangleBorder(
++          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
++        ),
++      ),
++      snackBarTheme: SnackBarThemeData(
++        behavior: SnackBarBehavior.floating,
++        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
++      ),
++      segmentedButtonTheme: SegmentedButtonThemeData(
++        style: ButtonStyle(
++          shape: const WidgetStatePropertyAll(StadiumBorder()),
++          side: const WidgetStatePropertyAll(BorderSide.none),
++          backgroundColor: WidgetStateProperty.resolveWith((s) =>
++              s.contains(WidgetState.selected)
++                  ? scheme.primary
++                  : scheme.surfaceContainerHighest),
++          foregroundColor: WidgetStateProperty.resolveWith((s) =>
++              s.contains(WidgetState.selected)
++                  ? scheme.onPrimary
++                  : scheme.onSurface),
++        ),
++      ),
++      switchTheme: SwitchThemeData(
++        thumbColor: WidgetStateProperty.resolveWith((s) =>
++            s.contains(WidgetState.selected) ? Colors.white : null),
++        trackColor: WidgetStateProperty.resolveWith((s) =>
++            s.contains(WidgetState.selected) ? scheme.primary : null),
++      ),
++      listTileTheme: const ListTileThemeData(
++        contentPadding: EdgeInsets.symmetric(horizontal: 16),
++      ),
++      dividerTheme: DividerThemeData(
++        color: scheme.onSurface.withAlpha(20),
++        space: 1,
++      ),
++    );
++  }
+ }
+diff --git a/lib/core/theme/category_style.dart b/lib/core/theme/category_style.dart
+new file mode 100644
+index 0000000..4f6841d
+--- /dev/null
++++ b/lib/core/theme/category_style.dart
+@@ -0,0 +1,46 @@
++import 'package:flutter/material.dart';
++
++import 'app_theme.dart';
++
++/// Cor + ícone por categoria, para cada lançamento ter identidade própria.
++/// Categorias conhecidas têm visual fixo; as criadas pelo usuário recebem uma
++/// cor estável (mesmo nome => mesma cor).
++class CategoryStyle {
++  const CategoryStyle(this.color, this.icon);
++  final Color color;
++  final IconData icon;
++
++  static const _known = <String, CategoryStyle>{
++    'alimentação': CategoryStyle(Color(0xFFFF7A45), Icons.restaurant_rounded),
++    'transporte': CategoryStyle(AppTheme.sky, Icons.directions_car_rounded),
++    'moradia': CategoryStyle(AppTheme.violet, Icons.home_rounded),
++    'saúde': CategoryStyle(AppTheme.pink, Icons.favorite_rounded),
++    'lazer': CategoryStyle(AppTheme.amber, Icons.sports_esports_rounded),
++    'educação': CategoryStyle(Color(0xFF14B8A6), Icons.school_rounded),
++    'eletrônicos': CategoryStyle(Color(0xFF6366F1), Icons.devices_rounded),
++    'roupas': CategoryStyle(Color(0xFFD946EF), Icons.checkroom_rounded),
++    'salário': CategoryStyle(AppTheme.incomeColor, Icons.payments_rounded),
++    'investimentos':
++        CategoryStyle(Color(0xFF0EA5A4), Icons.trending_up_rounded),
++    'outros': CategoryStyle(Color(0xFF8B8FA8), Icons.category_rounded),
++  };
++
++  static const _fallback = <Color>[
++    AppTheme.primary,
++    AppTheme.sky,
++    AppTheme.amber,
++    AppTheme.pink,
++    Color(0xFFFF7A45),
++    Color(0xFF14B8A6),
++    AppTheme.violet,
++  ];
++
++  static CategoryStyle of(String category) {
++    final key = category.trim().toLowerCase();
++    final known = _known[key];
++    if (known != null) return known;
++    final hash = key.codeUnits.fold<int>(0, (a, b) => a + b);
++    return CategoryStyle(
++        _fallback[hash % _fallback.length], Icons.label_rounded);
++  }
++}
+diff --git a/lib/presentation/pages/balance_page.dart b/lib/presentation/pages/balance_page.dart
+index f7a6bfe..109fb3e 100644
+--- a/lib/presentation/pages/balance_page.dart
++++ b/lib/presentation/pages/balance_page.dart
+@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
+ import '../../core/theme/app_theme.dart';
+ import '../../core/utils/money.dart';
+ import '../providers/data_providers.dart';
++import '../widgets/app_widgets.dart';
+ import '../widgets/transaction_form.dart';
+ import '../widgets/transaction_tile.dart';
+ 
+@@ -20,7 +21,7 @@ class BalancePage extends ConsumerWidget {
+       appBar: AppBar(title: const Text('Saldo real x previsto')),
+       floatingActionButton: FloatingActionButton.extended(
+         onPressed: () => showTransactionSheet(context),
+-        icon: const Icon(Icons.add),
++        icon: const Icon(Icons.add_rounded),
+         label: const Text('Lançar'),
+       ),
+       body: ListView(
+@@ -36,32 +37,33 @@ class BalancePage extends ConsumerWidget {
+             data: (s) => Column(
+               children: [
+                 _BalanceCard(
+-                    title: 'Saldo real',
+-                    subtitle: 'Receitas − despesas já realizadas',
+-                    cents: s.balance),
++                  title: 'Saldo real',
++                  subtitle: 'Receitas − despesas já realizadas',
++                  icon: Icons.account_balance_wallet_rounded,
++                  gradient: AppTheme.heroGradient,
++                  cents: s.balance,
++                ),
+                 _BalanceCard(
+                   title: 'Saldo previsto',
+                   subtitle:
+                       'Real + previstos (${Money.format(s.plannedIncome)} a receber, ${Money.format(s.plannedExpense)} a pagar)',
++                  icon: Icons.insights_rounded,
++                  gradient: AppTheme.sunsetGradient,
+                   cents: s.projectedBalance,
+                 ),
+               ],
+             ),
+           ),
+-          Padding(
+-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+-            child: Text('Lançamentos previstos',
+-                style: Theme.of(context).textTheme.titleMedium),
+-          ),
++          const SectionTitle('Lançamentos previstos'),
+           planned.when(
+             skipLoadingOnReload: true,
+             loading: () => const SizedBox.shrink(),
+             error: (e, _) => Text('Erro: $e'),
+             data: (list) => list.isEmpty
+                 ? const Padding(
+-                    padding: EdgeInsets.all(16),
+-                    child: Text(
+-                        'Nada previsto. Marque "Previsto" ao lançar uma despesa futura.'))
++                    padding: EdgeInsets.symmetric(vertical: 24),
++                    child: EmptyState(Icons.event_available_rounded,
++                        'Nada previsto.\nMarque "Previsto" ao lançar uma despesa futura.'))
+                 : Column(
+                     children: [for (final t in list) TransactionTile(tx: t)]),
+           ),
+@@ -72,35 +74,58 @@ class BalancePage extends ConsumerWidget {
+ }
+ 
+ class _BalanceCard extends StatelessWidget {
+-  const _BalanceCard(
+-      {required this.title, required this.subtitle, required this.cents});
++  const _BalanceCard({
++    required this.title,
++    required this.subtitle,
++    required this.icon,
++    required this.gradient,
++    required this.cents,
++  });
+   final String title;
+   final String subtitle;
++  final IconData icon;
++  final Gradient gradient;
+   final int cents;
+ 
+   @override
+-  Widget build(BuildContext context) => Card(
+-        margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+-        child: Padding(
+-          padding: const EdgeInsets.all(16),
+-          child: Column(
+-            crossAxisAlignment: CrossAxisAlignment.start,
+-            children: [
+-              Text(title, style: Theme.of(context).textTheme.titleMedium),
+-              const SizedBox(height: 4),
+-              Text(
+-                Money.format(cents),
+-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+-                      fontWeight: FontWeight.bold,
+-                      color: cents >= 0
+-                          ? AppTheme.incomeColor
+-                          : AppTheme.expenseColor,
+-                    ),
+-              ),
+-              const SizedBox(height: 4),
+-              Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+-            ],
+-          ),
++  Widget build(BuildContext context) => HeroCard(
++        gradient: gradient,
++        child: Column(
++          crossAxisAlignment: CrossAxisAlignment.start,
++          children: [
++            Row(
++              children: [
++                Container(
++                  padding: const EdgeInsets.all(8),
++                  decoration: BoxDecoration(
++                      color: Colors.white.withAlpha(46),
++                      borderRadius: BorderRadius.circular(14)),
++                  child: Icon(icon, color: Colors.white, size: 20),
++                ),
++                const SizedBox(width: 10),
++                Text(title,
++                    style: const TextStyle(
++                        color: Colors.white,
++                        fontWeight: FontWeight.w700,
++                        fontSize: 16)),
++              ],
++            ),
++            const SizedBox(height: 14),
++            FittedBox(
++              fit: BoxFit.scaleDown,
++              alignment: Alignment.centerLeft,
++              child: Text(Money.format(cents),
++                  style: const TextStyle(
++                      color: Colors.white,
++                      fontSize: 34,
++                      fontWeight: FontWeight.w800,
++                      letterSpacing: -1)),
++            ),
++            const SizedBox(height: 6),
++            Text(subtitle,
++                style: TextStyle(
++                    color: Colors.white.withAlpha(210), fontSize: 12.5)),
++          ],
+         ),
+       );
+ }
+diff --git a/lib/presentation/pages/home_shell.dart b/lib/presentation/pages/home_shell.dart
+index bee411f..fc7878b 100644
+--- a/lib/presentation/pages/home_shell.dart
++++ b/lib/presentation/pages/home_shell.dart
+@@ -1,39 +1,28 @@
+ import 'package:flutter/material.dart';
+ import 'package:go_router/go_router.dart';
+ 
++import '../widgets/curved_nav_bar.dart';
++
+ class HomeShell extends StatelessWidget {
+   const HomeShell({super.key, required this.shell});
+   final StatefulNavigationShell shell;
+ 
++  static const _items = [
++    CurvedNavItem(icon: Icons.calendar_month_rounded, label: 'Mês'),
++    CurvedNavItem(icon: Icons.bar_chart_rounded, label: 'Ano'),
++    CurvedNavItem(icon: Icons.account_balance_wallet_rounded, label: 'Saldo'),
++    CurvedNavItem(icon: Icons.savings_rounded, label: 'Guardado'),
++    CurvedNavItem(icon: Icons.settings_rounded, label: 'Ajustes'),
++  ];
++
+   @override
+   Widget build(BuildContext context) => Scaffold(
+         body: shell,
+-        bottomNavigationBar: NavigationBar(
+-          selectedIndex: shell.currentIndex,
+-          onDestinationSelected: (i) =>
++        bottomNavigationBar: CurvedNavBar(
++          items: _items,
++          currentIndex: shell.currentIndex,
++          onTap: (i) =>
+               shell.goBranch(i, initialLocation: i == shell.currentIndex),
+-          destinations: const [
+-            NavigationDestination(
+-                icon: Icon(Icons.calendar_month_outlined),
+-                selectedIcon: Icon(Icons.calendar_month),
+-                label: 'Mês'),
+-            NavigationDestination(
+-                icon: Icon(Icons.bar_chart_outlined),
+-                selectedIcon: Icon(Icons.bar_chart),
+-                label: 'Ano'),
+-            NavigationDestination(
+-                icon: Icon(Icons.account_balance_wallet_outlined),
+-                selectedIcon: Icon(Icons.account_balance_wallet),
+-                label: 'Saldo'),
+-            NavigationDestination(
+-                icon: Icon(Icons.savings_outlined),
+-                selectedIcon: Icon(Icons.savings),
+-                label: 'Guardado'),
+-            NavigationDestination(
+-                icon: Icon(Icons.settings_outlined),
+-                selectedIcon: Icon(Icons.settings),
+-                label: 'Ajustes'),
+-          ],
+         ),
+       );
+ }
+diff --git a/lib/presentation/pages/lock_page.dart b/lib/presentation/pages/lock_page.dart
+index 20fbebb..fce5800 100644
+--- a/lib/presentation/pages/lock_page.dart
++++ b/lib/presentation/pages/lock_page.dart
+@@ -1,6 +1,7 @@
+ import 'package:flutter/material.dart';
+ import 'package:flutter_riverpod/flutter_riverpod.dart';
+ 
++import '../../core/theme/app_theme.dart';
+ import '../providers/auth_controller.dart';
+ 
+ /// Única tela acessível sem biometria. Não lê nem exibe nenhum dado financeiro.
+@@ -12,30 +13,65 @@ class LockPage extends ConsumerWidget {
+     final auth = ref.watch(authControllerProvider);
+     final busy = auth.status == AuthStatus.authenticating;
+     return Scaffold(
+-      body: Center(
+-        child: Padding(
+-          padding: const EdgeInsets.all(32),
+-          child: Column(
+-            mainAxisSize: MainAxisSize.min,
+-            children: [
+-              Icon(Icons.fingerprint,
+-                  size: 96, color: Theme.of(context).colorScheme.primary),
+-              const SizedBox(height: 16),
+-              Text('Finanças',
+-                  style: Theme.of(context).textTheme.headlineMedium),
+-              const SizedBox(height: 8),
+-              Text(
+-                  auth.message ?? 'Use sua impressão digital para desbloquear.',
+-                  textAlign: TextAlign.center),
+-              const SizedBox(height: 24),
+-              FilledButton.icon(
+-                onPressed: busy
+-                    ? null
+-                    : () => ref.read(authControllerProvider.notifier).unlock(),
+-                icon: const Icon(Icons.lock_open),
+-                label: Text(busy ? 'Aguardando...' : 'Desbloquear'),
++      body: Container(
++        width: double.infinity,
++        decoration: const BoxDecoration(gradient: AppTheme.heroGradient),
++        child: SafeArea(
++          child: Center(
++            child: Padding(
++              padding: const EdgeInsets.all(32),
++              child: Column(
++                mainAxisSize: MainAxisSize.min,
++                children: [
++                  Container(
++                    width: 132,
++                    height: 132,
++                    decoration: BoxDecoration(
++                      shape: BoxShape.circle,
++                      color: Colors.white.withAlpha(36),
++                    ),
++                    child: Center(
++                      child: Container(
++                        width: 100,
++                        height: 100,
++                        decoration: const BoxDecoration(
++                            shape: BoxShape.circle, color: Colors.white),
++                        child: const Icon(Icons.fingerprint_rounded,
++                            size: 64, color: AppTheme.primary),
++                      ),
++                    ),
++                  ),
++                  const SizedBox(height: 28),
++                  const Text('Finanças',
++                      style: TextStyle(
++                          color: Colors.white,
++                          fontSize: 32,
++                          fontWeight: FontWeight.w800,
++                          letterSpacing: -0.8)),
++                  const SizedBox(height: 8),
++                  Text(
++                      auth.message ??
++                          'Use sua impressão digital para desbloquear.',
++                      textAlign: TextAlign.center,
++                      style: TextStyle(
++                          color: Colors.white.withAlpha(215), fontSize: 15)),
++                  const SizedBox(height: 32),
++                  FilledButton.icon(
++                    style: FilledButton.styleFrom(
++                      backgroundColor: Colors.white,
++                      foregroundColor: AppTheme.primaryDeep,
++                      minimumSize: const Size(220, 54),
++                    ),
++                    onPressed: busy
++                        ? null
++                        : () =>
++                            ref.read(authControllerProvider.notifier).unlock(),
++                    icon: const Icon(Icons.lock_open_rounded),
++                    label: Text(busy ? 'Aguardando...' : 'Desbloquear'),
++                  ),
++                ],
+               ),
+-            ],
++            ),
+           ),
+         ),
+       ),
+diff --git a/lib/presentation/pages/month_page.dart b/lib/presentation/pages/month_page.dart
+index 86bb678..90f0540 100644
+--- a/lib/presentation/pages/month_page.dart
++++ b/lib/presentation/pages/month_page.dart
+@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
+ 
+ import '../../core/utils/period_utils.dart';
+ import '../providers/data_providers.dart';
++import '../widgets/app_widgets.dart';
+ import '../widgets/filter_sheet.dart';
+ import '../widgets/period_navigator.dart';
+ import '../widgets/summary_card.dart';
+@@ -29,10 +30,10 @@ class MonthPage extends ConsumerWidget {
+     }
+ 
+     return Scaffold(
+-      appBar: AppBar(title: const Text('Mês'), actions: const [FilterButton()]),
++      appBar: AppBar(title: const Text('Seu mês'), actions: const [FilterButton()]),
+       floatingActionButton: FloatingActionButton.extended(
+         onPressed: () => showTransactionSheet(context),
+-        icon: const Icon(Icons.add),
++        icon: const Icon(Icons.add_rounded),
+         label: const Text('Lançar'),
+       ),
+       body: Column(
+@@ -45,25 +46,25 @@ class MonthPage extends ConsumerWidget {
+             height: 48,
+             child: ListView(
+               scrollDirection: Axis.horizontal,
+-              padding: const EdgeInsets.symmetric(horizontal: 16),
++              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+               children: [
+                 Padding(
+                   padding: const EdgeInsets.only(right: 8),
+-                  child: ChoiceChip(
+-                    label: const Text('Mês todo'),
++                  child: AppChoiceChip(
++                    label: 'Mês todo',
+                     selected: week == null,
+-                    onSelected: (_) =>
++                    onSelected: () =>
+                         ref.read(selectedWeekProvider.notifier).state = null,
+                   ),
+                 ),
+                 for (var i = 0; i < weeks.length; i++)
+                   Padding(
+                     padding: const EdgeInsets.only(right: 8),
+-                    child: ChoiceChip(
+-                      label: Text(
+-                          'Sem ${i + 1} (${weeks[i].start.day}–${weeks[i].lastDay.day})'),
++                    child: AppChoiceChip(
++                      label:
++                          'Sem ${i + 1} (${weeks[i].start.day}–${weeks[i].lastDay.day})',
+                       selected: week == i,
+-                      onSelected: (_) =>
++                      onSelected: () =>
+                           ref.read(selectedWeekProvider.notifier).state = i,
+                     ),
+                   ),
+@@ -77,12 +78,10 @@ class MonthPage extends ConsumerWidget {
+               loading: () => const Center(child: CircularProgressIndicator()),
+               error: (e, _) => Center(child: Text('Erro ao carregar: $e')),
+               data: (list) => list.isEmpty
+-                  ? const Center(
+-                      child: Text(
+-                          'Nenhum lançamento neste período.\nToque em "Lançar" para começar.',
+-                          textAlign: TextAlign.center))
++                  ? const EmptyState(Icons.receipt_long_rounded,
++                      'Nenhum lançamento neste período.\nToque em "Lançar" para começar.')
+                   : ListView.builder(
+-                      padding: const EdgeInsets.only(bottom: 88),
++                      padding: const EdgeInsets.only(top: 4, bottom: 88),
+                       itemCount: list.length,
+                       itemBuilder: (_, i) => TransactionTile(tx: list[i]),
+                     ),
+diff --git a/lib/presentation/pages/savings_page.dart b/lib/presentation/pages/savings_page.dart
+index a399de2..4ea47e0 100644
+--- a/lib/presentation/pages/savings_page.dart
++++ b/lib/presentation/pages/savings_page.dart
+@@ -9,6 +9,7 @@ import '../../core/utils/period_utils.dart';
+ import '../../domain/entities/savings_entry.dart';
+ import '../providers/data_providers.dart';
+ import '../providers/finance_actions.dart';
++import '../widgets/app_widgets.dart';
+ import '../widgets/field_decoration.dart';
+ 
+ /// Aba do dinheiro guardado: total acumulado + histórico de depósitos/retiradas.
+@@ -23,7 +24,7 @@ class SavingsPage extends ConsumerWidget {
+       floatingActionButton: FloatingActionButton.extended(
+         onPressed: () => showDialog<void>(
+             context: context, builder: (_) => const _SavingsDialog()),
+-        icon: const Icon(Icons.add),
++        icon: const Icon(Icons.add_rounded),
+         label: const Text('Movimentar'),
+       ),
+       body: entries.when(
+@@ -35,27 +36,49 @@ class SavingsPage extends ConsumerWidget {
+           return ListView(
+             padding: const EdgeInsets.only(bottom: 88),
+             children: [
+-              Card(
+-                margin: const EdgeInsets.all(16),
+-                child: Padding(
+-                  padding: const EdgeInsets.all(20),
+-                  child: Column(
+-                    children: [
+-                      const Text('Total guardado'),
+-                      const SizedBox(height: 4),
+-                      Text(Money.format(total),
+-                          style: Theme.of(context)
+-                              .textTheme
+-                              .headlineMedium
+-                              ?.copyWith(fontWeight: FontWeight.bold)),
+-                    ],
+-                  ),
++              HeroCard(
++                gradient: AppTheme.mintGradient,
++                child: Column(
++                  crossAxisAlignment: CrossAxisAlignment.start,
++                  children: [
++                    Row(
++                      children: [
++                        Container(
++                          padding: const EdgeInsets.all(8),
++                          decoration: BoxDecoration(
++                              color: Colors.white.withAlpha(46),
++                              borderRadius: BorderRadius.circular(14)),
++                          child: const Icon(Icons.savings_rounded,
++                              color: Colors.white, size: 20),
++                        ),
++                        const SizedBox(width: 10),
++                        const Text('Total guardado',
++                            style: TextStyle(
++                                color: Colors.white,
++                                fontWeight: FontWeight.w700,
++                                fontSize: 16)),
++                      ],
++                    ),
++                    const SizedBox(height: 14),
++                    FittedBox(
++                      fit: BoxFit.scaleDown,
++                      alignment: Alignment.centerLeft,
++                      child: Text(Money.format(total),
++                          style: const TextStyle(
++                              color: Colors.white,
++                              fontSize: 36,
++                              fontWeight: FontWeight.w800,
++                              letterSpacing: -1)),
++                    ),
++                  ],
+                 ),
+               ),
++              const SectionTitle('Movimentações'),
+               if (list.isEmpty)
+                 const Padding(
+-                    padding: EdgeInsets.all(16),
+-                    child: Center(child: Text('Nenhuma movimentação ainda.'))),
++                    padding: EdgeInsets.symmetric(vertical: 24),
++                    child: EmptyState(Icons.savings_rounded,
++                        'Nenhuma movimentação ainda.')),
+               for (final e in list) _EntryTile(entry: e),
+             ],
+           );
+@@ -73,22 +96,41 @@ class _EntryTile extends ConsumerWidget {
+   Widget build(BuildContext context, WidgetRef ref) {
+     final deposit = entry.amountCents > 0;
+     final color = deposit ? AppTheme.incomeColor : AppTheme.expenseColor;
+-    return ListTile(
+-      leading:
+-          Icon(deposit ? Icons.savings_outlined : Icons.output, color: color),
+-      title: Text(entry.note.isEmpty
+-          ? (deposit ? 'Depósito' : 'Retirada')
+-          : entry.note),
+-      subtitle: Text(DateFormat('dd/MM/yyyy').format(entry.date)),
+-      trailing: Row(
+-        mainAxisSize: MainAxisSize.min,
++    return AppCard(
++      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
++      padding: const EdgeInsets.fromLTRB(12, 10, 4, 10),
++      child: Row(
+         children: [
++          IconBadge(
++              deposit ? Icons.savings_rounded : Icons.output_rounded, color),
++          const SizedBox(width: 12),
++          Expanded(
++            child: Column(
++              crossAxisAlignment: CrossAxisAlignment.start,
++              children: [
++                Text(
++                    entry.note.isEmpty
++                        ? (deposit ? 'Depósito' : 'Retirada')
++                        : entry.note,
++                    style: const TextStyle(
++                        fontWeight: FontWeight.w700, fontSize: 15)),
++                Text(DateFormat('dd/MM/yyyy').format(entry.date),
++                    style: TextStyle(
++                        fontSize: 12.5,
++                        color: Theme.of(context)
++                            .colorScheme
++                            .onSurface
++                            .withAlpha(150))),
++              ],
++            ),
++          ),
+           Text(
+               '${deposit ? '+' : '-'} ${Money.format(entry.amountCents.abs())}',
+-              style: TextStyle(color: color, fontWeight: FontWeight.bold)),
++              style: TextStyle(
++                  color: color, fontWeight: FontWeight.w800, fontSize: 15)),
+           IconButton(
+             tooltip: 'Excluir',
+-            icon: const Icon(Icons.delete_outline),
++            icon: const Icon(Icons.delete_outline_rounded),
+             onPressed: () async {
+               final ok = await showDialog<bool>(
+                 context: context,
+@@ -99,6 +141,9 @@ class _EntryTile extends ConsumerWidget {
+                         onPressed: () => Navigator.pop(ctx, false),
+                         child: const Text('Cancelar')),
+                     FilledButton(
++                        style: FilledButton.styleFrom(
++                            minimumSize: const Size(96, 44),
++                            backgroundColor: AppTheme.expenseColor),
+                         onPressed: () => Navigator.pop(ctx, true),
+                         child: const Text('Excluir')),
+                   ],
+diff --git a/lib/presentation/pages/settings_page.dart b/lib/presentation/pages/settings_page.dart
+index 6de1106..a1f7e03 100644
+--- a/lib/presentation/pages/settings_page.dart
++++ b/lib/presentation/pages/settings_page.dart
+@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
+ import 'package:flutter_riverpod/flutter_riverpod.dart';
+ import 'package:intl/intl.dart';
+ 
++import '../../core/theme/app_theme.dart';
+ import '../../domain/entities/catalog_item.dart';
+ import '../../domain/services/spreadsheet_codec.dart';
+ import '../providers/auth_controller.dart';
+@@ -9,6 +10,7 @@ import '../providers/data_providers.dart';
+ import '../providers/di_providers.dart';
+ import '../providers/finance_actions.dart';
+ import '../providers/theme_controller.dart';
++import '../widgets/app_widgets.dart';
+ 
+ class SettingsPage extends ConsumerWidget {
+   const SettingsPage({super.key});
+@@ -155,9 +157,12 @@ class SettingsPage extends ConsumerWidget {
+       crossAxisAlignment: CrossAxisAlignment.stretch,
+       children: [
+         ListTile(
+-          leading:
+-              Icon(isCategory ? Icons.category_outlined : Icons.place_outlined),
+-          title: Text(label),
++          leading: IconBadge(
++              isCategory ? Icons.category_rounded : Icons.place_rounded,
++              isCategory ? AppTheme.pink : AppTheme.sky,
++              size: 40),
++          title: Text(label,
++              style: const TextStyle(fontWeight: FontWeight.w700)),
+           trailing: IconButton(
+             tooltip: 'Adicionar',
+             icon: const Icon(Icons.add),
+@@ -212,8 +217,9 @@ class SettingsPage extends ConsumerWidget {
+     return Scaffold(
+       appBar: AppBar(title: const Text('Ajustes')),
+       body: ListView(
++        padding: const EdgeInsets.only(bottom: 24),
+         children: [
+-          const ListTile(title: Text('Tema')),
++          const SectionTitle('Aparência'),
+           Padding(
+             padding: const EdgeInsets.symmetric(horizontal: 16),
+             child: SegmentedButton<ThemeMode>(
+@@ -222,54 +228,73 @@ class SettingsPage extends ConsumerWidget {
+                 ButtonSegment(
+                     value: ThemeMode.system,
+                     label: Text('Sistema'),
+-                    icon: Icon(Icons.brightness_auto)),
++                    icon: Icon(Icons.brightness_auto_rounded)),
+                 ButtonSegment(
+                     value: ThemeMode.light,
+                     label: Text('Claro'),
+-                    icon: Icon(Icons.light_mode)),
++                    icon: Icon(Icons.light_mode_rounded)),
+                 ButtonSegment(
+                     value: ThemeMode.dark,
+                     label: Text('Escuro'),
+-                    icon: Icon(Icons.dark_mode)),
++                    icon: Icon(Icons.dark_mode_rounded)),
+               ],
+               selected: {mode},
+               onSelectionChanged: (s) =>
+                   ref.read(themeControllerProvider.notifier).setMode(s.first),
+             ),
+           ),
+-          const Divider(height: 32),
+-          const ListTile(title: Text('Dados (Excel / Google Sheets)')),
+-          ListTile(
+-            leading: const Icon(Icons.table_view),
+-            title: const Text('Exportar CSV'),
+-            subtitle:
+-                const Text('Separador ";" — abre no Excel e no Google Sheets'),
+-            onTap: () => _export(context, ref, SpreadsheetFormat.csv),
+-          ),
+-          ListTile(
+-            leading: const Icon(Icons.grid_on),
+-            title: const Text('Exportar XLSX'),
+-            onTap: () => _export(context, ref, SpreadsheetFormat.xlsx),
+-          ),
+-          ListTile(
+-            leading: const Icon(Icons.upload_file),
+-            title: const Text('Importar CSV / XLSX'),
+-            subtitle: const Text(
+-                'Colunas: Data, Tipo, Valor, Descricao, Categoria, Local, Status'),
+-            onTap: () => _import(context, ref),
++          const SectionTitle('Dados (Excel / Google Sheets)'),
++          AppCard(
++            child: Column(
++              children: [
++                ListTile(
++                  leading: const IconBadge(
++                      Icons.table_view_rounded, AppTheme.incomeColor,
++                      size: 40),
++                  title: const Text('Exportar CSV'),
++                  subtitle: const Text(
++                      'Separador ";" — abre no Excel e no Google Sheets'),
++                  onTap: () => _export(context, ref, SpreadsheetFormat.csv),
++                ),
++                ListTile(
++                  leading: const IconBadge(
++                      Icons.grid_on_rounded, AppTheme.primary,
++                      size: 40),
++                  title: const Text('Exportar XLSX'),
++                  onTap: () => _export(context, ref, SpreadsheetFormat.xlsx),
++                ),
++                ListTile(
++                  leading: const IconBadge(
++                      Icons.upload_file_rounded, AppTheme.amber,
++                      size: 40),
++                  title: const Text('Importar CSV / XLSX'),
++                  subtitle: const Text(
++                      'Colunas: Data, Tipo, Valor, Descricao, Categoria, Local, Status'),
++                  onTap: () => _import(context, ref),
++                ),
++              ],
++            ),
+           ),
+-          const Divider(height: 32),
+-          const ListTile(
+-            title: Text('Cadastros'),
+-            subtitle: Text('Opções usadas nos lançamentos'),
++          const SectionTitle('Cadastros',
++              subtitle: 'Opções usadas nos lançamentos'),
++          AppCard(
++            child: Column(
++              children: [
++                _catalogSection(context, ref, CatalogKind.category),
++                const Divider(),
++                _catalogSection(context, ref, CatalogKind.place),
++              ],
++            ),
+           ),
+-          _catalogSection(context, ref, CatalogKind.category),
+-          _catalogSection(context, ref, CatalogKind.place),
+-          const Divider(height: 32),
+-          ListTile(
+-            leading: const Icon(Icons.lock),
+-            title: const Text('Bloquear agora'),
+-            onTap: () => ref.read(authControllerProvider.notifier).lock(),
++          const SectionTitle('Segurança'),
++          AppCard(
++            child: ListTile(
++              leading: const IconBadge(
++                  Icons.lock_rounded, AppTheme.expenseColor,
++                  size: 40),
++              title: const Text('Bloquear agora'),
++              onTap: () => ref.read(authControllerProvider.notifier).lock(),
++            ),
+           ),
+         ],
+       ),
+diff --git a/lib/presentation/pages/year_page.dart b/lib/presentation/pages/year_page.dart
+index cb317b5..aae45cb 100644
+--- a/lib/presentation/pages/year_page.dart
++++ b/lib/presentation/pages/year_page.dart
+@@ -8,6 +8,7 @@ import '../../core/theme/app_theme.dart';
+ import '../../core/utils/money.dart';
+ import '../../domain/entities/finance_summary.dart';
+ import '../providers/data_providers.dart';
++import '../widgets/app_widgets.dart';
+ import '../widgets/filter_sheet.dart';
+ import '../widgets/period_navigator.dart';
+ import '../widgets/summary_card.dart';
+@@ -31,39 +32,102 @@ class YearPage extends ConsumerWidget {
+         loading: () => const Center(child: CircularProgressIndicator()),
+         error: (e, _) => Center(child: Text('Erro ao carregar: $e')),
+         data: (list) => ListView(
++          padding: const EdgeInsets.only(bottom: 24),
+           children: [
+             PeriodNavigator(
+                 label: '$year',
+                 onPrevious: () => goToYear(-1),
+                 onNext: () => goToYear(1)),
+-            SummaryCard(summary: FinanceSummary.combine(list)),
+-            SizedBox(
+-                height: 200,
+-                child: Padding(
+-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+-                    child: _YearChart(list))),
+-            const SizedBox(height: 8),
+-            for (var m = 0; m < 12; m++)
+-              ListTile(
+-                title: Text(toBeginningOfSentenceCase(
+-                    DateFormat.MMMM('pt_BR').format(DateTime(year, m + 1)))),
+-                subtitle: Text(
+-                    'Receitas ${Money.format(list[m].income)}  •  Despesas ${Money.format(list[m].expense)}'),
+-                trailing: Text(
+-                  Money.format(list[m].balance),
+-                  style: TextStyle(
+-                    fontWeight: FontWeight.bold,
+-                    color: list[m].balance >= 0
+-                        ? AppTheme.incomeColor
+-                        : AppTheme.expenseColor,
++            SummaryCard(
++                summary: FinanceSummary.combine(list), title: 'Saldo do ano'),
++            AppCard(
++              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
++              child: Column(
++                crossAxisAlignment: CrossAxisAlignment.start,
++                children: [
++                  Row(
++                    children: [
++                      Text('Receitas x despesas',
++                          style: Theme.of(context).textTheme.titleSmall),
++                      const Spacer(),
++                      const _Legend('Receitas', AppTheme.incomeColor),
++                      const SizedBox(width: 12),
++                      const _Legend('Despesas', AppTheme.expenseColor),
++                    ],
+                   ),
+-                ),
++                  const SizedBox(height: 12),
++                  SizedBox(height: 180, child: _YearChart(list)),
++                ],
++              ),
++            ),
++            const SectionTitle('Mês a mês'),
++            for (var m = 0; m < 12; m++)
++              AppCard(
++                margin:
++                    const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
++                padding:
++                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                 onTap: () {
+                   ref.read(selectedMonthProvider.notifier).state =
+                       DateTime(year, m + 1);
+                   ref.read(selectedWeekProvider.notifier).state = null;
+                   context.go('/month'); // detalha o mês tocado
+                 },
++                child: Row(
++                  children: [
++                    Container(
++                      width: 46,
++                      height: 46,
++                      alignment: Alignment.center,
++                      decoration: BoxDecoration(
++                        color: AppTheme.primary.withAlpha(30),
++                        borderRadius: BorderRadius.circular(16),
++                      ),
++                      child: Text(
++                        DateFormat.MMM('pt_BR')
++                            .format(DateTime(year, m + 1))
++                            .replaceAll('.', '')
++                            .toUpperCase(),
++                        style: TextStyle(
++                            fontSize: 12,
++                            fontWeight: FontWeight.w800,
++                            color: Theme.of(context).colorScheme.primary),
++                      ),
++                    ),
++                    const SizedBox(width: 12),
++                    Expanded(
++                      child: Column(
++                        crossAxisAlignment: CrossAxisAlignment.start,
++                        children: [
++                          Text(
++                              toBeginningOfSentenceCase(DateFormat.MMMM('pt_BR')
++                                  .format(DateTime(year, m + 1))),
++                              style: const TextStyle(
++                                  fontWeight: FontWeight.w700, fontSize: 15)),
++                          const SizedBox(height: 2),
++                          Text(
++                            '+ ${Money.format(list[m].income)}   − ${Money.format(list[m].expense)}',
++                            style: TextStyle(
++                                fontSize: 12.5,
++                                color: Theme.of(context)
++                                    .colorScheme
++                                    .onSurface
++                                    .withAlpha(150)),
++                          ),
++                        ],
++                      ),
++                    ),
++                    Text(
++                      Money.format(list[m].balance),
++                      style: TextStyle(
++                        fontWeight: FontWeight.w800,
++                        color: list[m].balance >= 0
++                            ? AppTheme.incomeColor
++                            : AppTheme.expenseColor,
++                      ),
++                    ),
++                  ],
++                ),
+               ),
+           ],
+         ),
+@@ -72,28 +136,36 @@ class YearPage extends ConsumerWidget {
+   }
+ }
+ 
++class _Legend extends StatelessWidget {
++  const _Legend(this.label, this.color);
++  final String label;
++  final Color color;
++
++  @override
++  Widget build(BuildContext context) => Row(
++        children: [
++          Container(
++              width: 8,
++              height: 8,
++              decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
++          const SizedBox(width: 4),
++          Text(label, style: const TextStyle(fontSize: 11.5)),
++        ],
++      );
++}
++
+ class _YearChart extends StatelessWidget {
+   const _YearChart(this.months);
+   final List<FinanceSummary> months;
+ 
+   static const _labels = [
+-    'J',
+-    'F',
+-    'M',
+-    'A',
+-    'M',
+-    'J',
+-    'J',
+-    'A',
+-    'S',
+-    'O',
+-    'N',
+-    'D'
++    'J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D' //
+   ];
+ 
+   @override
+   Widget build(BuildContext context) {
+     const hidden = AxisTitles(sideTitles: SideTitles(showTitles: false));
++    const radius = BorderRadius.vertical(top: Radius.circular(6));
+     return BarChart(
+       BarChartData(
+         gridData: const FlGridData(show: false),
+@@ -109,7 +181,8 @@ class _YearChart extends StatelessWidget {
+               getTitlesWidget: (v, meta) => SideTitleWidget(
+                 axisSide: meta.axisSide,
+                 child: Text(_labels[v.toInt()],
+-                    style: const TextStyle(fontSize: 11)),
++                    style: const TextStyle(
++                        fontSize: 11, fontWeight: FontWeight.w600)),
+               ),
+             ),
+           ),
+@@ -123,11 +196,13 @@ class _YearChart extends StatelessWidget {
+                 BarChartRodData(
+                     toY: months[i].income / 100,
+                     color: AppTheme.incomeColor,
+-                    width: 6),
++                    borderRadius: radius,
++                    width: 7),
+                 BarChartRodData(
+                     toY: months[i].expense / 100,
+                     color: AppTheme.expenseColor,
+-                    width: 6),
++                    borderRadius: radius,
++                    width: 7),
+               ],
+             ),
+         ],
+diff --git a/lib/presentation/widgets/app_widgets.dart b/lib/presentation/widgets/app_widgets.dart
+new file mode 100644
+index 0000000..b9dff5b
+--- /dev/null
++++ b/lib/presentation/widgets/app_widgets.dart
+@@ -0,0 +1,235 @@
++import 'package:flutter/material.dart';
++
++import '../../core/theme/app_theme.dart';
++
++/// Cartão padrão: cantos grandes, sombra suave (claro) ou borda sutil (escuro).
++class AppCard extends StatelessWidget {
++  const AppCard({
++    super.key,
++    required this.child,
++    this.margin = const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
++    this.padding,
++    this.onTap,
++    this.onLongPress,
++    this.radius = 22,
++  });
++
++  final Widget child;
++  final EdgeInsetsGeometry margin;
++  final EdgeInsetsGeometry? padding;
++  final VoidCallback? onTap;
++  final VoidCallback? onLongPress;
++  final double radius;
++
++  @override
++  Widget build(BuildContext context) {
++    final theme = Theme.of(context);
++    final dark = theme.brightness == Brightness.dark;
++    final shape = RoundedRectangleBorder(
++      borderRadius: BorderRadius.circular(radius),
++      side: dark
++          ? BorderSide(color: Colors.white.withAlpha(16))
++          : BorderSide.none,
++    );
++    return Container(
++      margin: margin,
++      decoration: BoxDecoration(
++        borderRadius: BorderRadius.circular(radius),
++        boxShadow: dark
++            ? null
++            : [
++                BoxShadow(
++                  color: AppTheme.primary.withAlpha(24),
++                  blurRadius: 18,
++                  offset: const Offset(0, 8),
++                ),
++              ],
++      ),
++      child: Material(
++        color: theme.colorScheme.surface,
++        shape: shape,
++        clipBehavior: Clip.antiAlias,
++        child: InkWell(
++          onTap: onTap,
++          onLongPress: onLongPress,
++          child: padding == null
++              ? child
++              : Padding(padding: padding!, child: child),
++        ),
++      ),
++    );
++  }
++}
++
++/// Cartão de destaque com gradiente e bolhas decorativas.
++class HeroCard extends StatelessWidget {
++  const HeroCard({
++    super.key,
++    required this.child,
++    this.gradient = AppTheme.heroGradient,
++    this.margin = const EdgeInsets.fromLTRB(16, 8, 16, 8),
++  });
++
++  final Widget child;
++  final Gradient gradient;
++  final EdgeInsetsGeometry margin;
++
++  @override
++  Widget build(BuildContext context) {
++    final first = (gradient as LinearGradient).colors.first;
++    return Container(
++      margin: margin,
++      decoration: BoxDecoration(
++        gradient: gradient,
++        borderRadius: BorderRadius.circular(30),
++        boxShadow: [
++          BoxShadow(
++            color: first.withAlpha(90),
++            blurRadius: 26,
++            offset: const Offset(0, 14),
++          ),
++        ],
++      ),
++      child: ClipRRect(
++        borderRadius: BorderRadius.circular(30),
++        child: Stack(
++          children: [
++            Positioned(right: -34, top: -34, child: _bubble(130, 30)),
++            Positioned(left: -28, bottom: -48, child: _bubble(120, 22)),
++            Padding(padding: const EdgeInsets.all(22), child: child),
++          ],
++        ),
++      ),
++    );
++  }
++
++  static Widget _bubble(double size, int alpha) => Container(
++        width: size,
++        height: size,
++        decoration: BoxDecoration(
++            shape: BoxShape.circle, color: Colors.white.withAlpha(alpha)),
++      );
++}
++
++/// Ícone dentro de um quadrado arredondado colorido (listas e ajustes).
++class IconBadge extends StatelessWidget {
++  const IconBadge(this.icon, this.color, {super.key, this.size = 46});
++  final IconData icon;
++  final Color color;
++  final double size;
++
++  @override
++  Widget build(BuildContext context) => Container(
++        width: size,
++        height: size,
++        decoration: BoxDecoration(
++          color: color.withAlpha(34),
++          borderRadius: BorderRadius.circular(size * 0.35),
++        ),
++        child: Icon(icon, color: color, size: size * 0.5),
++      );
++}
++
++/// Chips em formato de pílula; o selecionado fica na cor primária.
++class AppChoiceChip extends StatelessWidget {
++  const AppChoiceChip(
++      {super.key,
++      required this.label,
++      required this.selected,
++      required this.onSelected});
++  final String label;
++  final bool selected;
++  final VoidCallback onSelected;
++
++  @override
++  Widget build(BuildContext context) => ChoiceChip(
++        label: Text(label),
++        labelStyle: TextStyle(
++          fontWeight: FontWeight.w600,
++          color: selected ? Colors.white : null,
++        ),
++        selected: selected,
++        showCheckmark: false,
++        selectedColor: AppTheme.primary,
++        side: BorderSide.none,
++        shape: const StadiumBorder(),
++        onSelected: (_) => onSelected(),
++      );
++}
++
++class AppFilterChip extends StatelessWidget {
++  const AppFilterChip(
++      {super.key,
++      required this.label,
++      required this.selected,
++      required this.onSelected});
++  final String label;
++  final bool selected;
++  final VoidCallback onSelected;
++
++  @override
++  Widget build(BuildContext context) => FilterChip(
++        label: Text(label),
++        labelStyle: TextStyle(
++          fontWeight: FontWeight.w600,
++          color: selected ? Colors.white : null,
++        ),
++        selected: selected,
++        checkmarkColor: Colors.white,
++        selectedColor: AppTheme.primary,
++        side: BorderSide.none,
++        shape: const StadiumBorder(),
++        onSelected: (_) => onSelected(),
++      );
++}
++
++class SectionTitle extends StatelessWidget {
++  const SectionTitle(this.text, {super.key, this.subtitle});
++  final String text;
++  final String? subtitle;
++
++  @override
++  Widget build(BuildContext context) => Padding(
++        padding: const EdgeInsets.fromLTRB(22, 20, 22, 6),
++        child: Column(
++          crossAxisAlignment: CrossAxisAlignment.start,
++          children: [
++            Text(text, style: Theme.of(context).textTheme.titleMedium),
++            if (subtitle != null)
++              Text(subtitle!,
++                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
++                      color: Theme.of(context)
++                          .colorScheme
++                          .onSurface
++                          .withAlpha(150))),
++          ],
++        ),
++      );
++}
++
++class EmptyState extends StatelessWidget {
++  const EmptyState(this.icon, this.message, {super.key});
++  final IconData icon;
++  final String message;
++
++  @override
++  Widget build(BuildContext context) => Center(
++        child: Padding(
++          padding: const EdgeInsets.all(32),
++          child: Column(
++            mainAxisSize: MainAxisSize.min,
++            children: [
++              IconBadge(icon, AppTheme.primary, size: 72),
++              const SizedBox(height: 16),
++              Text(message,
++                  textAlign: TextAlign.center,
++                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
++                      color: Theme.of(context)
++                          .colorScheme
++                          .onSurface
++                          .withAlpha(160))),
++            ],
++          ),
++        ),
++      );
++}
+diff --git a/lib/presentation/widgets/curved_nav_bar.dart b/lib/presentation/widgets/curved_nav_bar.dart
+new file mode 100644
+index 0000000..db4ea49
+--- /dev/null
++++ b/lib/presentation/widgets/curved_nav_bar.dart
+@@ -0,0 +1,232 @@
++import 'dart:math' as math;
++
++import 'package:flutter/material.dart';
++
++import '../../core/theme/app_theme.dart';
++
++class CurvedNavItem {
++  const CurvedNavItem({required this.icon, required this.label});
++  final IconData icon;
++  final String label;
++}
++
++/// Menu inferior flutuante com "recorte" curvo: a bolinha do item ativo sobe
++/// acima da barra e desliza suavemente até o próximo item tocado.
++class CurvedNavBar extends StatelessWidget {
++  const CurvedNavBar({
++    super.key,
++    required this.items,
++    required this.currentIndex,
++    required this.onTap,
++  });
++
++  final List<CurvedNavItem> items;
++  final int currentIndex;
++  final ValueChanged<int> onTap;
++
++  static const double _barHeight = 68;
++  static const double _circleRadius = 27;
++  static const double _ringWidth = 7;
++  static const double _ringRadius = _circleRadius + _ringWidth;
++  static const double _lift = 30; // quanto o anel sobe acima da barra
++
++  @override
++  Widget build(BuildContext context) {
++    final theme = Theme.of(context);
++    final dark = theme.brightness == Brightness.dark;
++    final bg = theme.scaffoldBackgroundColor;
++    final barColor = theme.colorScheme.surface;
++    final bottom = math.max(MediaQuery.of(context).padding.bottom, 10.0);
++
++    return Padding(
++      padding: EdgeInsets.fromLTRB(14, 0, 14, bottom),
++      child: SizedBox(
++        height: _barHeight + _lift,
++        child: LayoutBuilder(builder: (context, constraints) {
++          final itemW = constraints.maxWidth / items.length;
++          final targetX = currentIndex * itemW + itemW / 2;
++
++          return TweenAnimationBuilder<double>(
++            tween: Tween<double>(end: targetX),
++            duration: const Duration(milliseconds: 380),
++            curve: Curves.easeOutCubic,
++            builder: (context, cx, _) => Stack(
++              clipBehavior: Clip.none,
++              children: [
++                // Barra com o recorte
++                Positioned(
++                  left: 0,
++                  right: 0,
++                  bottom: 0,
++                  height: _barHeight,
++                  child: CustomPaint(
++                    painter: _BarPainter(
++                      cx: cx,
++                      color: barColor,
++                      shadowColor:
++                          dark ? Colors.black : AppTheme.primary.withAlpha(120),
++                      borderColor:
++                          dark ? Colors.white.withAlpha(16) : null,
++                    ),
++                  ),
++                ),
++                // Ícones e rótulos
++                for (var i = 0; i < items.length; i++)
++                  Positioned(
++                    left: i * itemW,
++                    width: itemW,
++                    bottom: 0,
++                    height: _barHeight,
++                    child: _NavButton(
++                      item: items[i],
++                      selected: i == currentIndex,
++                      onTap: () => onTap(i),
++                    ),
++                  ),
++                // Bolinha do item ativo
++                Positioned(
++                  left: cx - _ringRadius,
++                  top: 0,
++                  width: _ringRadius * 2,
++                  height: _ringRadius * 2,
++                  child: Container(
++                    padding: const EdgeInsets.all(_ringWidth),
++                    decoration:
++                        BoxDecoration(shape: BoxShape.circle, color: bg),
++                    child: Container(
++                      decoration: BoxDecoration(
++                        shape: BoxShape.circle,
++                        gradient: AppTheme.heroGradient,
++                        boxShadow: [
++                          BoxShadow(
++                            color: AppTheme.primary.withAlpha(110),
++                            blurRadius: 14,
++                            offset: const Offset(0, 6),
++                          ),
++                        ],
++                      ),
++                      child: AnimatedSwitcher(
++                        duration: const Duration(milliseconds: 260),
++                        transitionBuilder: (child, anim) =>
++                            ScaleTransition(scale: anim, child: child),
++                        child: Icon(
++                          items[currentIndex].icon,
++                          key: ValueKey(currentIndex),
++                          color: Colors.white,
++                          size: 26,
++                        ),
++                      ),
++                    ),
++                  ),
++                ),
++              ],
++            ),
++          );
++        }),
++      ),
++    );
++  }
++}
++
++class _NavButton extends StatelessWidget {
++  const _NavButton(
++      {required this.item, required this.selected, required this.onTap});
++  final CurvedNavItem item;
++  final bool selected;
++  final VoidCallback onTap;
++
++  @override
++  Widget build(BuildContext context) {
++    final scheme = Theme.of(context).colorScheme;
++    final muted = scheme.onSurface.withAlpha(140);
++    return Semantics(
++      button: true,
++      selected: selected,
++      label: item.label,
++      child: GestureDetector(
++        behavior: HitTestBehavior.opaque,
++        onTap: onTap,
++        child: Padding(
++          padding: const EdgeInsets.only(bottom: 11),
++          child: Column(
++            mainAxisAlignment: MainAxisAlignment.end,
++            children: [
++              // O ícone do item ativo "vira" a bolinha, então some daqui.
++              AnimatedOpacity(
++                duration: const Duration(milliseconds: 200),
++                opacity: selected ? 0 : 1,
++                child: Icon(item.icon, size: 24, color: muted),
++              ),
++              const SizedBox(height: 4),
++              AnimatedDefaultTextStyle(
++                duration: const Duration(milliseconds: 200),
++                style: TextStyle(
++                  fontSize: 11.5,
++                  height: 1.2,
++                  fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
++                  color: selected ? scheme.primary : muted,
++                ),
++                child: Text(item.label, maxLines: 1),
++              ),
++            ],
++          ),
++        ),
++      ),
++    );
++  }
++}
++
++class _BarPainter extends CustomPainter {
++  _BarPainter({
++    required this.cx,
++    required this.color,
++    required this.shadowColor,
++    this.borderColor,
++  });
++
++  final double cx;
++  final Color color;
++  final Color shadowColor;
++  final Color? borderColor;
++
++  @override
++  void paint(Canvas canvas, Size size) {
++    const depth = CurvedNavBar._ringRadius * 2 - CurvedNavBar._lift; // 38
++    const hw = 58.0; // meia-largura do recorte
++
++    final bar = Path()
++      ..addRRect(RRect.fromRectAndRadius(
++          Offset.zero & size, const Radius.circular(28)));
++
++    // Região "com recorte": retângulo largo cuja borda superior mergulha em cx.
++    final notched = Path()
++      ..moveTo(-100, 0)
++      ..lineTo(cx - hw, 0)
++      ..cubicTo(cx - hw * 0.5, 0, cx - CurvedNavBar._ringRadius * 0.95, depth,
++          cx, depth)
++      ..cubicTo(cx + CurvedNavBar._ringRadius * 0.95, depth, cx + hw * 0.5, 0,
++          cx + hw, 0)
++      ..lineTo(size.width + 100, 0)
++      ..lineTo(size.width + 100, size.height)
++      ..lineTo(-100, size.height)
++      ..close();
++
++    // Interseção mantém os cantos arredondados mesmo com o recorte na borda.
++    final path = Path.combine(PathOperation.intersect, bar, notched);
++
++    canvas.drawShadow(path, shadowColor, 10, false);
++    canvas.drawPath(path, Paint()..color = color);
++    if (borderColor != null) {
++      canvas.drawPath(
++          path,
++          Paint()
++            ..style = PaintingStyle.stroke
++            ..strokeWidth = 1
++            ..color = borderColor!);
++    }
++  }
++
++  @override
++  bool shouldRepaint(_BarPainter old) =>
++      old.cx != cx || old.color != color || old.shadowColor != shadowColor;
++}
+diff --git a/lib/presentation/widgets/field_decoration.dart b/lib/presentation/widgets/field_decoration.dart
+index 04868c4..baa7442 100644
+--- a/lib/presentation/widgets/field_decoration.dart
++++ b/lib/presentation/widgets/field_decoration.dart
+@@ -1,9 +1,24 @@
+ import 'package:flutter/material.dart';
+ 
+-InputDecoration fieldDecoration(String label, {IconData? icon, String? hint}) =>
+-    InputDecoration(
+-      labelText: label,
+-      hintText: hint,
+-      prefixIcon: icon == null ? null : Icon(icon),
+-      border: const OutlineInputBorder(),
+-    );
++import '../../core/theme/app_theme.dart';
++
++InputDecoration fieldDecoration(String label, {IconData? icon, String? hint}) {
++  OutlineInputBorder border(Color color, [double width = 0]) =>
++      OutlineInputBorder(
++        borderRadius: BorderRadius.circular(18),
++        borderSide: width == 0
++            ? BorderSide.none
++            : BorderSide(color: color, width: width),
++      );
++  return InputDecoration(
++    labelText: label,
++    hintText: hint,
++    prefixIcon: icon == null ? null : Icon(icon),
++    filled: true,
++    border: border(Colors.transparent),
++    enabledBorder: border(Colors.transparent),
++    focusedBorder: border(AppTheme.primary, 1.8),
++    errorBorder: border(AppTheme.expenseColor, 1.4),
++    focusedErrorBorder: border(AppTheme.expenseColor, 1.8),
++  );
++}
+diff --git a/lib/presentation/widgets/filter_sheet.dart b/lib/presentation/widgets/filter_sheet.dart
+index d1cd126..0f3d55b 100644
+--- a/lib/presentation/widgets/filter_sheet.dart
++++ b/lib/presentation/widgets/filter_sheet.dart
+@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
+ import '../../domain/entities/fin_transaction.dart';
+ import '../../domain/entities/transaction_filter.dart';
+ import '../providers/data_providers.dart';
++import 'app_widgets.dart';
+ 
+ /// Botão de filtro com indicador (bolinha) quando há filtros ativos.
+ class FilterButton extends ConsumerWidget {
+@@ -14,7 +15,7 @@ class FilterButton extends ConsumerWidget {
+     final active = ref.watch(filterProvider).hasAttributeFilters;
+     return IconButton(
+       tooltip: 'Filtros',
+-      icon: Badge(isLabelVisible: active, child: const Icon(Icons.filter_list)),
++      icon: Badge(isLabelVisible: active, child: const Icon(Icons.tune_rounded)),
+       onPressed: () => showFilterSheet(context),
+     );
+   }
+@@ -51,12 +52,13 @@ class _FilterSheet extends ConsumerWidget {
+             ? const Text('Nada cadastrado ainda.')
+             : Wrap(
+                 spacing: 8,
++                runSpacing: 4,
+                 children: [
+                   for (final v in all)
+-                    FilterChip(
+-                        label: Text(v),
++                    AppFilterChip(
++                        label: v,
+                         selected: selected.contains(v),
+-                        onSelected: (_) => onChange(_toggle(selected, v))),
++                        onSelected: () => onChange(_toggle(selected, v))),
+                 ],
+               );
+ 
+@@ -82,18 +84,18 @@ class _FilterSheet extends ConsumerWidget {
+           Wrap(
+             spacing: 8,
+             children: [
+-              ChoiceChip(
+-                  label: const Text('Todos'),
++              AppChoiceChip(
++                  label: 'Todos',
+                   selected: f.type == null,
+-                  onSelected: (_) => update(f.copyWith(clearType: true))),
+-              ChoiceChip(
+-                  label: const Text('Ganhos'),
++                  onSelected: () => update(f.copyWith(clearType: true))),
++              AppChoiceChip(
++                  label: 'Ganhos',
+                   selected: f.type == TxType.income,
+-                  onSelected: (_) => update(f.copyWith(type: TxType.income))),
+-              ChoiceChip(
+-                  label: const Text('Gastos'),
++                  onSelected: () => update(f.copyWith(type: TxType.income))),
++              AppChoiceChip(
++                  label: 'Gastos',
+                   selected: f.type == TxType.expense,
+-                  onSelected: (_) => update(f.copyWith(type: TxType.expense))),
++                  onSelected: () => update(f.copyWith(type: TxType.expense))),
+             ],
+           ),
+           const SizedBox(height: 16),
+diff --git a/lib/presentation/widgets/period_navigator.dart b/lib/presentation/widgets/period_navigator.dart
+index 007a0f4..213820b 100644
+--- a/lib/presentation/widgets/period_navigator.dart
++++ b/lib/presentation/widgets/period_navigator.dart
+@@ -1,5 +1,7 @@
+ import 'package:flutter/material.dart';
+ 
++import '../../core/theme/app_theme.dart';
++
+ class PeriodNavigator extends StatelessWidget {
+   const PeriodNavigator(
+       {super.key,
+@@ -12,18 +14,51 @@ class PeriodNavigator extends StatelessWidget {
+   final VoidCallback onNext;
+ 
+   @override
+-  Widget build(BuildContext context) => Row(
+-        mainAxisAlignment: MainAxisAlignment.center,
+-        children: [
+-          IconButton(
+-              icon: const Icon(Icons.chevron_left),
+-              onPressed: onPrevious,
+-              tooltip: 'Anterior'),
+-          Text(label, style: Theme.of(context).textTheme.titleMedium),
+-          IconButton(
+-              icon: const Icon(Icons.chevron_right),
+-              onPressed: onNext,
+-              tooltip: 'Próximo'),
+-        ],
++  Widget build(BuildContext context) => Padding(
++        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
++        child: Row(
++          children: [
++            _RoundButton(
++                icon: Icons.chevron_left_rounded,
++                tooltip: 'Anterior',
++                onTap: onPrevious),
++            Expanded(
++              child: Center(
++                child: Text(label,
++                    style: Theme.of(context).textTheme.titleMedium),
++              ),
++            ),
++            _RoundButton(
++                icon: Icons.chevron_right_rounded,
++                tooltip: 'Próximo',
++                onTap: onNext),
++          ],
++        ),
+       );
+ }
++
++class _RoundButton extends StatelessWidget {
++  const _RoundButton(
++      {required this.icon, required this.tooltip, required this.onTap});
++  final IconData icon;
++  final String tooltip;
++  final VoidCallback onTap;
++
++  @override
++  Widget build(BuildContext context) {
++    final color = Theme.of(context).colorScheme.primary;
++    return Tooltip(
++      message: tooltip,
++      child: Material(
++        color: AppTheme.primary.withAlpha(26),
++        shape: const CircleBorder(),
++        child: InkWell(
++          customBorder: const CircleBorder(),
++          onTap: onTap,
++          child: SizedBox(
++              width: 40, height: 40, child: Icon(icon, color: color)),
++        ),
++      ),
++    );
++  }
++}
+diff --git a/lib/presentation/widgets/summary_card.dart b/lib/presentation/widgets/summary_card.dart
+index 1eefceb..4883fcd 100644
+--- a/lib/presentation/widgets/summary_card.dart
++++ b/lib/presentation/widgets/summary_card.dart
+@@ -3,64 +3,113 @@ import 'package:flutter/material.dart';
+ import '../../core/theme/app_theme.dart';
+ import '../../core/utils/money.dart';
+ import '../../domain/entities/finance_summary.dart';
++import 'app_widgets.dart';
+ 
++/// Cartão de destaque: saldo grande + receitas/despesas em "pílulas".
+ class SummaryCard extends StatelessWidget {
+-  const SummaryCard({super.key, required this.summary});
++  const SummaryCard(
++      {super.key, required this.summary, this.title = 'Saldo do período'});
+   final FinanceSummary summary;
++  final String title;
+ 
+   @override
+   Widget build(BuildContext context) {
+-    final balanceColor =
+-        summary.balance >= 0 ? AppTheme.incomeColor : AppTheme.expenseColor;
+-    return Card(
+-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+-      child: Padding(
+-        padding: const EdgeInsets.all(16),
+-        child: Column(
+-          children: [
++    return HeroCard(
++      child: Column(
++        crossAxisAlignment: CrossAxisAlignment.start,
++        children: [
++          Text(title,
++              style: TextStyle(
++                  color: Colors.white.withAlpha(200),
++                  fontWeight: FontWeight.w600)),
++          const SizedBox(height: 4),
++          FittedBox(
++            fit: BoxFit.scaleDown,
++            alignment: Alignment.centerLeft,
++            child: Text(Money.format(summary.balance),
++                style: const TextStyle(
++                    color: Colors.white,
++                    fontSize: 36,
++                    fontWeight: FontWeight.w800,
++                    letterSpacing: -1)),
++          ),
++          const SizedBox(height: 18),
++          Row(
++            children: [
++              Expanded(
++                  child: _Pill('Receitas', summary.income,
++                      Icons.arrow_downward_rounded, AppTheme.incomeColor)),
++              const SizedBox(width: 12),
++              Expanded(
++                  child: _Pill('Despesas', summary.expense,
++                      Icons.arrow_upward_rounded, AppTheme.expenseColor)),
++            ],
++          ),
++          if (summary.hasPlanned) ...[
++            const SizedBox(height: 14),
+             Row(
+-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+               children: [
+-                _Metric('Receitas', summary.income, AppTheme.incomeColor),
+-                _Metric('Despesas', summary.expense, AppTheme.expenseColor),
+-                _Metric('Saldo', summary.balance, balanceColor),
++                Icon(Icons.schedule_rounded,
++                    size: 18, color: Colors.white.withAlpha(200)),
++                const SizedBox(width: 6),
++                Text('Saldo previsto',
++                    style: TextStyle(color: Colors.white.withAlpha(200))),
++                const Spacer(),
++                Text(Money.format(summary.projectedBalance),
++                    style: const TextStyle(
++                        color: Colors.white, fontWeight: FontWeight.w800)),
+               ],
+             ),
+-            if (summary.hasPlanned) ...[
+-              const Divider(height: 24),
+-              Row(
+-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+-                children: [
+-                  Text('Saldo previsto',
+-                      style: Theme.of(context).textTheme.bodyMedium),
+-                  Text(Money.format(summary.projectedBalance),
+-                      style: Theme.of(context).textTheme.titleSmall),
+-                ],
+-              ),
+-            ],
+           ],
+-        ),
++        ],
+       ),
+     );
+   }
+ }
+ 
+-class _Metric extends StatelessWidget {
+-  const _Metric(this.label, this.cents, this.color);
++class _Pill extends StatelessWidget {
++  const _Pill(this.label, this.cents, this.icon, this.color);
+   final String label;
+   final int cents;
++  final IconData icon;
+   final Color color;
+ 
+   @override
+-  Widget build(BuildContext context) => Column(
+-        children: [
+-          Text(label, style: Theme.of(context).textTheme.labelMedium),
+-          const SizedBox(height: 4),
+-          Text(Money.format(cents),
+-              style: Theme.of(context)
+-                  .textTheme
+-                  .titleSmall
+-                  ?.copyWith(color: color, fontWeight: FontWeight.bold)),
+-        ],
++  Widget build(BuildContext context) => Container(
++        padding: const EdgeInsets.all(10),
++        decoration: BoxDecoration(
++          color: Colors.white.withAlpha(36),
++          borderRadius: BorderRadius.circular(20),
++        ),
++        child: Row(
++          children: [
++            Container(
++              width: 34,
++              height: 34,
++              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
++              child: Icon(icon, size: 18, color: Colors.white),
++            ),
++            const SizedBox(width: 8),
++            Expanded(
++              child: Column(
++                crossAxisAlignment: CrossAxisAlignment.start,
++                children: [
++                  Text(label,
++                      style: TextStyle(
++                          color: Colors.white.withAlpha(200), fontSize: 12)),
++                  FittedBox(
++                    fit: BoxFit.scaleDown,
++                    alignment: Alignment.centerLeft,
++                    child: Text(Money.format(cents),
++                        style: const TextStyle(
++                            color: Colors.white,
++                            fontWeight: FontWeight.w800,
++                            fontSize: 14)),
++                  ),
++                ],
++              ),
++            ),
++          ],
++        ),
+       );
+ }
+diff --git a/lib/presentation/widgets/transaction_form.dart b/lib/presentation/widgets/transaction_form.dart
+index f994b38..f486f6c 100644
+--- a/lib/presentation/widgets/transaction_form.dart
++++ b/lib/presentation/widgets/transaction_form.dart
+@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
+ import 'package:intl/intl.dart';
+ 
+ import '../../core/constants/app_constants.dart';
++import '../../core/theme/app_theme.dart';
+ import '../../core/utils/cents_input_formatter.dart';
+ import '../../core/utils/money.dart';
+ import '../../core/utils/period_utils.dart';
+@@ -150,16 +151,19 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
+             mainAxisSize: MainAxisSize.min,
+             crossAxisAlignment: CrossAxisAlignment.stretch,
+             children: [
++              Text(widget.initial == null ? 'Novo lançamento' : 'Editar lançamento',
++                  style: Theme.of(context).textTheme.titleLarge),
++              const SizedBox(height: 14),
+               SegmentedButton<TxType>(
+                 segments: const [
+                   ButtonSegment(
+                       value: TxType.expense,
+                       label: Text('Gasto'),
+-                      icon: Icon(Icons.arrow_upward)),
++                      icon: Icon(Icons.arrow_upward_rounded)),
+                   ButtonSegment(
+                       value: TxType.income,
+                       label: Text('Ganho'),
+-                      icon: Icon(Icons.arrow_downward)),
++                      icon: Icon(Icons.arrow_downward_rounded)),
+                 ],
+                 selected: {_type},
+                 onSelectionChanged: (s) => setState(() => _type = s.first),
+@@ -170,7 +174,10 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
+                 autofocus: widget.initial == null,
+                 keyboardType: TextInputType.number,
+                 inputFormatters: [CentsInputFormatter()],
+-                style: Theme.of(context).textTheme.headlineSmall,
++                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
++                    color: _type == TxType.income
++                        ? AppTheme.incomeColor
++                        : AppTheme.expenseColor),
+                 decoration: fieldDecoration('Valor', icon: Icons.attach_money),
+                 validator: (v) => (Money.parseCents(v ?? '') ?? 0) <= 0
+                     ? 'Informe um valor'
+@@ -217,7 +224,7 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
+               const SizedBox(height: 8),
+               FilledButton.icon(
+                   onPressed: _save,
+-                  icon: const Icon(Icons.check),
++                  icon: const Icon(Icons.check_rounded),
+                   label: const Text('Salvar')),
+             ],
+           ),
+diff --git a/lib/presentation/widgets/transaction_tile.dart b/lib/presentation/widgets/transaction_tile.dart
+index f0fa7db..0cbda96 100644
+--- a/lib/presentation/widgets/transaction_tile.dart
++++ b/lib/presentation/widgets/transaction_tile.dart
+@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
+ import 'package:intl/intl.dart';
+ 
+ import '../../core/theme/app_theme.dart';
++import '../../core/theme/category_style.dart';
+ import '../../core/utils/money.dart';
+ import '../../domain/entities/fin_transaction.dart';
+ import '../providers/finance_actions.dart';
++import 'app_widgets.dart';
+ import 'transaction_form.dart';
+ 
+ /// Toque = editar · segurar = excluir · ✓ = marcar previsto como realizado.
+@@ -16,39 +18,79 @@ class TransactionTile extends ConsumerWidget {
+   @override
+   Widget build(BuildContext context, WidgetRef ref) {
+     final isIncome = tx.type == TxType.income;
+-    final color = isIncome ? AppTheme.incomeColor : AppTheme.expenseColor;
++    final amountColor = isIncome ? AppTheme.incomeColor : AppTheme.expenseColor;
++    final style = CategoryStyle.of(tx.category);
++    final muted = Theme.of(context).colorScheme.onSurface.withAlpha(150);
+     final info = [
+       tx.category,
+       if (tx.place.isNotEmpty) tx.place,
+       DateFormat('dd/MM').format(tx.date),
+-      if (tx.planned) 'Previsto',
+     ].join(' • ');
+ 
+-    return ListTile(
+-      leading: CircleAvatar(
+-        backgroundColor: color.withAlpha(36),
+-        child: Icon(isIncome ? Icons.arrow_downward : Icons.arrow_upward,
+-            color: color),
+-      ),
+-      title: Text(tx.description.isEmpty ? tx.category : tx.description,
+-          maxLines: 1, overflow: TextOverflow.ellipsis),
+-      subtitle: Text(info, maxLines: 1, overflow: TextOverflow.ellipsis),
+-      trailing: Row(
+-        mainAxisSize: MainAxisSize.min,
++    return AppCard(
++      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
++      padding: const EdgeInsets.fromLTRB(12, 12, 14, 12),
++      onTap: () => showTransactionSheet(context, initial: tx),
++      onLongPress: () => _confirmDelete(context, ref),
++      child: Row(
+         children: [
+-          Text('${isIncome ? '+' : '-'} ${Money.format(tx.amountCents)}',
+-              style: TextStyle(color: color, fontWeight: FontWeight.bold)),
+-          if (tx.planned)
+-            IconButton(
+-              tooltip: 'Marcar como realizado',
+-              icon: const Icon(Icons.check_circle_outline),
+-              onPressed: () =>
+-                  ref.read(financeActionsProvider).markRealized(tx),
++          IconBadge(style.icon, style.color),
++          const SizedBox(width: 12),
++          Expanded(
++            child: Column(
++              crossAxisAlignment: CrossAxisAlignment.start,
++              children: [
++                Text(tx.description.isEmpty ? tx.category : tx.description,
++                    maxLines: 1,
++                    overflow: TextOverflow.ellipsis,
++                    style: const TextStyle(
++                        fontWeight: FontWeight.w700, fontSize: 15)),
++                const SizedBox(height: 2),
++                Text(info,
++                    maxLines: 1,
++                    overflow: TextOverflow.ellipsis,
++                    style: TextStyle(color: muted, fontSize: 12.5)),
++                if (tx.planned) ...[
++                  const SizedBox(height: 6),
++                  Container(
++                    padding:
++                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
++                    decoration: BoxDecoration(
++                      color: AppTheme.amber.withAlpha(40),
++                      borderRadius: BorderRadius.circular(20),
++                    ),
++                    child: const Text('Previsto',
++                        style: TextStyle(
++                            fontSize: 11,
++                            fontWeight: FontWeight.w700,
++                            color: Color(0xFFB87400))),
++                  ),
++                ],
++              ],
+             ),
++          ),
++          const SizedBox(width: 8),
++          Column(
++            crossAxisAlignment: CrossAxisAlignment.end,
++            children: [
++              Text('${isIncome ? '+' : '-'} ${Money.format(tx.amountCents)}',
++                  style: TextStyle(
++                      color: amountColor,
++                      fontWeight: FontWeight.w800,
++                      fontSize: 15)),
++              if (tx.planned)
++                IconButton(
++                  tooltip: 'Marcar como realizado',
++                  visualDensity: VisualDensity.compact,
++                  icon: const Icon(Icons.check_circle_rounded,
++                      color: AppTheme.incomeColor),
++                  onPressed: () =>
++                      ref.read(financeActionsProvider).markRealized(tx),
++                ),
++            ],
++          ),
+         ],
+       ),
+-      onTap: () => showTransactionSheet(context, initial: tx),
+-      onLongPress: () => _confirmDelete(context, ref),
+     );
+   }
+ 
+@@ -63,6 +105,9 @@ class TransactionTile extends ConsumerWidget {
+               onPressed: () => Navigator.pop(ctx, false),
+               child: const Text('Cancelar')),
+           FilledButton(
++              style: FilledButton.styleFrom(
++                  minimumSize: const Size(96, 44),
++                  backgroundColor: AppTheme.expenseColor),
+               onPressed: () => Navigator.pop(ctx, true),
+               child: const Text('Excluir')),
+         ],
